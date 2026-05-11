@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
+<head>
+    <title>Home</title>
+
+    <style>
+
+        .search-box {
+            background: white;
+            padding: 24px;
+            border-radius: 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .trip-card {
+            border: none;
+            border-radius: 14px;
+            transition: 0.2s;
+        }
+
+        .trip-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .trip-route {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .trip-info {
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .empty-box {
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            text-align: center;
+            color: #888;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+    <!-- SEARCH -->
+    <div class="search-box">
+
+        <h4 class="mb-4">
+            🔎 Tìm chuyến xe
+        </h4>
+
+        <!-- ERROR -->
+        <div th:if="${error != null}"
+             class="alert alert-danger">
+
+            <span th:text="${error}"></span>
+
+        </div>
+
+        <form class="row g-3"
+              method="get"
+              th:action="@{/home}">
+
+            <!-- FROM -->
+            <div class="col-md-3">
+
+                <select class="form-control"
+                        name="fromId">
+
+                    <option value="">
+                        -- Điểm đi --
+                    </option>
+
+                    <option th:each="l : ${locations}"
+                            th:value="${l.id}"
+                            th:text="${l.name}"
+                            th:selected="${param.fromId != null && param.fromId[0] == l.id.toString()}">
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- TO -->
+            <div class="col-md-3">
+
+                <select class="form-control"
+                        name="toId">
+
+                    <option value="">
+                        -- Điểm đến --
+                    </option>
+
+                    <option th:each="l : ${locations}"
+                            th:value="${l.id}"
+                            th:text="${l.name}"
+                            th:selected="${param.toId != null && param.toId[0] == l.id.toString()}">
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- DATE -->
+            <div class="col-md-3">
+
+                <input type="date"
+                       class="form-control"
+                       name="date"
+                       th:value="${param.date}"
+                       th:attr="min=${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+
+            </div>
+
+            <!-- BUTTON -->
+            <div class="col-md-3">
+
+                <button class="btn btn-primary btn-block">
+
+                    <i class="fa fa-search"></i>
+                    Tìm chuyến
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- LIST TRIPS -->
+    <div class="mt-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <h4>
+                🚍 Danh sách chuyến xe
+            </h4>
+
+        </div>
+
+        <!-- EMPTY -->
+        <div th:if="${searched && #lists.isEmpty(trips)}"
+             class="empty-box">
+
+            <h5>
+                😢 Không có chuyến nào phù hợp
+            </h5>
+
+            <p class="mb-0">
+                Vui lòng thử tuyến đường hoặc ngày khác
+            </p>
+
+        </div>
+
+        <!-- TRIP LIST -->
+        <div th:if="${!#lists.isEmpty(trips)}">
+
+            <div class="card trip-card shadow-sm mb-3"
+                 th:each="trip : ${trips}">
+
+                <div class="card-body">
+
+                    <!-- ROUTE -->
+                    <div class="trip-route">
+
+                        <span th:text="${trip.route.origin.name}">
+                        </span>
+
+                        →
+
+                        <span th:text="${trip.route.destination.name}">
+                        </span>
+
+                    </div>
+
+                    <!-- INFO -->
+                    <div class="trip-info">
+
+                        ⏰
+
+                        <span th:text="${#temporals.format(
+                            trip.departureTime,
+                            'HH:mm dd/MM/yyyy'
+                        )}">
+                        </span>
+
+                        &nbsp;&nbsp;|&nbsp;&nbsp;
+
+                        🚌
+
+                        <span th:text="${trip.bus.busType}">
+                        </span>
+
+                        &nbsp;&nbsp;|&nbsp;&nbsp;
+
+                        💰
+
+                        <span th:text="${#numbers.formatDecimal(
+                            trip.price,
+                            0,
+                            'COMMA',
+                            0,
+                            'POINT'
+                        )}">
+                        </span>đ
+
+                        &nbsp;&nbsp;|&nbsp;&nbsp;
+
+                        👤
+
+                        <span th:text="${trip.driver.fullName}">
+                        </span>
+
+                    </div>
+
+                    <!-- ACTION -->
+                    <div class="mt-3">
+
+                        <a th:href="@{/trips/{id}/seats(id=${trip.id})}"
+                           class="btn btn-success btn-sm">
+
+                            <i class="fa fa-chair"></i>
+                            Chọn ghế
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

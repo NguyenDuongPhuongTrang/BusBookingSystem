@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Quản lý chuyến đi</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+
+        body {
+            background: #f4f6f9;
+        }
+
+        .sidebar {
+            height: 100vh;
+            background: #343a40;
+        }
+
+        .sidebar a {
+            color: white;
+            display: block;
+            padding: 12px 20px;
+        }
+
+        .sidebar a:hover {
+            background: #495057;
+            text-decoration: none;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .page-title {
+            font-weight: 700;
+            color: #343a40;
+        }
+
+        .btn {
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .table td,
+        .table th {
+            vertical-align: middle;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container-fluid">
+
+    <div class="row">
+
+        <!-- SIDEBAR -->
+        <div class="col-md-2 sidebar p-0">
+
+            <h4 class="text-center py-3 text-white">
+                ADMIN SYSTEM
+            </h4>
+
+            <a th:href="@{/admin}">
+                <i class="fa fa-home"></i>
+                Trang chủ
+            </a>
+
+            <a th:href="@{/admin/users}">
+                <i class="fa fa-users"></i>
+                Quản lý người dùng
+            </a>
+
+            <a th:href="@{/admin/buses}">
+                <i class="fa fa-bus"></i>
+                Quản lý xe
+            </a>
+
+            <a th:href="@{/admin/drivers}">
+                <i class="fa fa-id-card"></i>
+                Quản lý tài xế
+            </a>
+
+            <a th:href="@{/admin/trips}"
+               class="bg-secondary">
+
+                <i class="fa fa-route"></i>
+                Quản lý chuyến đi
+
+            </a>
+
+            <a href="/logout">
+
+                <i class="fa fa-sign-out-alt"></i>
+                Đăng xuất
+
+            </a>
+
+        </div>
+
+        <!-- MAIN -->
+        <div class="col-md-10 p-4">
+
+            <!-- HEADER -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <h3 class="page-title mb-0">
+
+                    <i class="fa fa-route"></i>
+                    Quản lý chuyến đi
+
+                </h3>
+
+                <div>
+                    👤
+                    <span th:text="${#strings.capitalize(session.USER.username)}">
+                    </span>
+                </div>
+
+            </div>
+
+            <!-- TOP ACTION -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                <!-- SEARCH -->
+                <form class="form-inline"
+                      method="get"
+                      th:action="@{/admin/trips}">
+
+                    <input type="text"
+                           name="keyword"
+                           class="form-control mr-2"
+                           placeholder="Tìm điểm đi / điểm đến..."
+                           th:value="${keyword}">
+
+                    <button class="btn btn-dark">
+                        <i class="fa fa-search"></i>
+                    </button>
+
+                </form>
+
+                <!-- CREATE -->
+                <a th:href="@{/admin/trips/create}"
+                   class="btn btn-primary shadow-sm">
+
+                    <i class="fa fa-plus"></i>
+                    Thêm chuyến đi
+
+                </a>
+
+            </div>
+
+            <!-- TABLE -->
+            <div class="card shadow">
+
+                <div class="card-body p-0">
+
+                    <div class="table-responsive">
+
+                        <table class="table table-hover text-center mb-0">
+
+                            <thead class="thead-dark">
+
+                            <tr>
+
+                                <th>ID</th>
+
+                                <th>Tuyến đường</th>
+
+                                <th>Xe</th>
+
+                                <th>Tài xế</th>
+
+                                <th>Khởi hành</th>
+
+                                <th>Giá vé</th>
+
+                                <th>Số ghế</th>
+
+                                <th>Trạng thái</th>
+
+                                <th>Hành động</th>
+
+                            </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                            <tr th:each="trip : ${tripPage.content}">
+
+                                <td th:text="${trip.id}"></td>
+
+                                <td>
+
+                                    <b th:text="${trip.route.origin.name}"></b>
+
+                                    →
+
+                                    <b th:text="${trip.route.destination.name}"></b>
+
+                                </td>
+
+                                <td th:text="${trip.bus.licensePlate}"></td>
+
+                                <td th:text="${trip.driver.fullName}"></td>
+
+                                <td>
+
+                                    <span th:text="${#temporals.format(
+                                        trip.departureTime,
+                                        'HH:mm dd/MM/yyyy'
+                                    )}">
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    <span th:text="${#numbers.formatDecimal(
+                                        trip.price,
+                                        0,
+                                        'COMMA',
+                                        0,
+                                        'POINT'
+                                    )}">
+                                    </span> đ
+
+                                </td>
+
+                                <td th:text="${trip.bus.totalSeats}"></td>
+
+                                <td>
+
+                                    <span class="badge badge-success"
+                                          th:if="${trip.status.name() == 'OPEN'}">
+
+                                        Đang mở
+
+                                    </span>
+
+                                    <span class="badge badge-warning"
+                                          th:if="${trip.status.name() == 'FULL'}">
+
+                                        Hết chỗ
+
+                                    </span>
+
+                                    <span class="badge badge-danger"
+                                          th:if="${trip.status.name() == 'CANCELLED'}">
+
+                                        Đã hủy
+
+                                    </span>
+
+                                    <span class="badge badge-secondary"
+                                          th:if="${trip.status.name() == 'COMPLETED'}">
+
+                                        Hoàn thành
+
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    <!-- EDIT -->
+                                    <a th:href="@{/admin/trips/edit/{id}(id=${trip.id})}"
+                                       class="btn btn-warning btn-sm">
+
+                                        <i class="fa fa-edit"></i>
+
+                                    </a>
+
+                                    <a th:href="@{/admin/trips/status/{id}(id=${trip.id})}"
+                                       class="btn btn-info btn-sm">
+
+                                        <i class="fa fa-gear"></i>
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <!-- PAGINATION -->
+                    <div class="d-flex justify-content-center mt-4 mb-3">
+
+                        <ul class="pagination">
+
+                            <li class="page-item"
+                                th:classappend="${tripPage.first} ? 'disabled'">
+
+                                <a class="page-link"
+                                   th:href="@{/admin/trips(
+                                   page=${tripPage.number - 1},
+                                   keyword=${keyword}
+                                   )}">
+                                    Previous
+                                </a>
+
+                            </li>
+
+                            <li class="page-item"
+                                th:each="i : ${#numbers.sequence(0, tripPage.totalPages - 1)}"
+                                th:classappend="${i == tripPage.number} ? 'active'">
+
+                                <a class="page-link"
+                                   th:text="${i + 1}"
+                                   th:href="@{/admin/trips(
+                                   page=${i},
+                                   keyword=${keyword}
+                                   )}">
+                                </a>
+
+                            </li>
+
+                            <li class="page-item"
+                                th:classappend="${tripPage.last} ? 'disabled'">
+
+                                <a class="page-link"
+                                   th:href="@{/admin/trips(
+                                   page=${tripPage.number + 1},
+                                   keyword=${keyword}
+                                   )}">
+                                    Next
+                                </a>
+
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

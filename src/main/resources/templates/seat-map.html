@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Chọn ghế</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+
+        body{
+            background:#f4f6f9;
+        }
+
+        .seat-layout{
+            background:white;
+            border-radius:16px;
+            padding:30px;
+            box-shadow:0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .seat-grid{
+            display:grid;
+            grid-template-columns: repeat(4, 80px);
+            gap:18px;
+            justify-content:center;
+        }
+
+        .seat{
+            width:70px;
+            height:70px;
+            border:none;
+            border-radius:14px;
+            color:white;
+            font-weight:700;
+            transition:0.2s;
+        }
+
+        .seat:hover{
+            transform:translateY(-3px);
+        }
+
+        .available{
+            background:#28a745;
+        }
+
+        .selected{
+            background:#007bff;
+        }
+
+        .pending{
+            background:#ffc107;
+            cursor:not-allowed;
+        }
+
+        .booked{
+            background:#dc3545;
+            cursor:not-allowed;
+        }
+
+        .bill-box{
+            background:white;
+            border-radius:16px;
+            padding:25px;
+            box-shadow:0 2px 10px rgba(0,0,0,0.08);
+            position:sticky;
+            top:20px;
+            margin-bottom:30px;
+        }
+
+        .legend-item{
+            display:flex;
+            align-items:center;
+            margin-bottom:12px;
+        }
+
+        .legend-color{
+            width:20px;
+            height:20px;
+            border-radius:6px;
+            margin-right:10px;
+        }
+
+        .my-hold {
+            background: #ffc107;
+            cursor: pointer;  /* override cursor:not-allowed */
+            border: 3px solid #e0a800;
+        }
+
+        .my-hold:hover {
+            transform: translateY(-3px);
+            opacity: 0.85;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container mt-5">
+
+    <div class="row">
+
+        <!-- LEFT -->
+        <div class="col-md-8">
+
+            <div class="seat-layout">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+
+                    <h3>
+                        🚍 Chọn ghế
+                    </h3>
+
+                    <a href="/home"
+                       class="btn btn-outline-secondary btn-sm">
+
+                        <i class="fa fa-arrow-left"></i>
+                        Quay lại
+
+                    </a>
+
+                </div>
+
+                <!-- SEAT GRID -->
+                <div class="seat-grid">
+
+                    <div th:each="seat : ${seats}">
+
+                        <!-- AVAILABLE -->
+                        <button
+                                th:if="${seat.status.name() == 'AVAILABLE'}"
+
+                                type="button"
+
+                                class="seat available selectable-seat"
+
+                                th:data-id="${seat.id}"
+
+                                th:data-seat="${seat.seatNumber}"
+
+                                th:data-price="${seat.trip.price}">
+
+                            <span th:text="${seat.seatNumber}"></span>
+
+                        </button>
+
+                        <!-- PENDING - của mình -->
+                        <button
+                                th:if="${seat.status.name() == 'PENDING'
+             and seat.holdByUser != null
+             and seat.holdByUser.id == currentUserId}"
+                                type="button"
+                                class="seat pending selectable-seat my-hold"
+                                th:data-id="${seat.id}"
+                                th:data-seat="${seat.seatNumber}"
+                                th:data-price="${seat.trip.price}">
+                            <span th:text="${seat.seatNumber}"></span>
+                        </button>
+
+                        <!-- PENDING - của người khác -->
+                        <button
+                                th:if="${seat.status.name() == 'PENDING'
+             and (seat.holdByUser == null
+                  or seat.holdByUser.id != currentUserId)}"
+                                class="seat pending"
+                                disabled>
+                            <span th:text="${seat.seatNumber}"></span>
+                        </button>
+
+                        <!-- BOOKED -->
+                        <button
+                                th:if="${seat.status.name() == 'BOOKED'}"
+
+                                class="seat booked"
+
+                                disabled>
+
+                            <span th:text="${seat.seatNumber}"></span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="col-md-4">
+
+            <div class="bill-box">
+
+                <h4 class="mb-4">
+                    🧾 Thông tin đặt vé
+                </h4>
+
+                <!-- LEGEND -->
+                <div class="mb-4">
+
+                    <div class="legend-item">
+
+                        <div class="legend-color"
+                             style="background:#28a745">
+                        </div>
+
+                        <span>Còn trống</span>
+
+                    </div>
+
+                    <div class="legend-item">
+
+                        <div class="legend-color"
+                             style="background:#007bff">
+                        </div>
+
+                        <span>Đang chọn</span>
+
+                    </div>
+
+                    <div class="legend-item">
+
+                        <div class="legend-color"
+                             style="background:#ffc107">
+                        </div>
+
+                        <span>Đang giữ</span>
+
+                    </div>
+
+                    <div class="legend-item">
+
+                        <div class="legend-color"
+                             style="background:#dc3545">
+                        </div>
+
+                        <span>Đã đặt</span>
+
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <!-- SELECTED SEATS -->
+                <div class="mb-3">
+
+                    <h6>
+                        🎟 Ghế đã chọn
+                    </h6>
+
+                    <p id="selectedSeats"
+                       class="text-muted mb-0">
+
+                        Chưa chọn
+
+                    </p>
+
+                </div>
+
+                <hr>
+
+                <!-- NOTE -->
+                <div class="mb-3">
+
+                    <h6>
+                        📌 Lưu ý
+                    </h6>
+
+                    <p class="text-muted mb-2">
+                        Bạn có thể chọn nhiều ghế cùng lúc trước khi đặt vé.
+                    </p>
+
+                    <p class="text-muted mb-0">
+                        Ghế đã chọn sẽ được xác nhận ở bước tiếp theo.
+                    </p>
+
+                </div>
+
+                <hr>
+
+                <!-- PRICE -->
+                <div class="mb-4">
+
+                    <h6>
+                        💰 Tổng tiền
+                    </h6>
+
+                    <h3 class="text-danger">
+
+                        <span id="totalPrice">
+                            0
+                        </span>
+
+                        đ
+
+                    </h3>
+
+                </div>
+
+                <!-- FORM -->
+                <form method="post"
+                      th:action="@{/tickets/booking}">
+
+                    <div id="seatInputs"></div>
+
+                    <button class="btn btn-success btn-block btn-lg">
+
+                        Đặt vé
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    const selectedSeats = [];
+    const currentUserId = /*[[${currentUserId}]]*/ null;
+    const tripId = /*[[${tripId}]]*/ null;
+
+    const selectedSeatsText = document.getElementById("selectedSeats");
+    const totalPriceText    = document.getElementById("totalPrice");
+    const seatInputs        = document.getElementById("seatInputs");
+
+    document.querySelectorAll(".selectable-seat").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const seatId   = btn.dataset.id;
+            const seatName = btn.dataset.seat;
+            const price    = parseInt(btn.dataset.price);
+            const index    = selectedSeats.findIndex(s => s.id === seatId);
+
+            if (index >= 0) {
+                selectedSeats.splice(index, 1);
+                btn.classList.remove("selected");
+                btn.classList.add("available"); // luôn về xanh khi bỏ chọn
+                renderBill();
+
+            } else {
+                // Chọn ghế → hold ngay trên server
+                try {
+                    const res = await fetch("/seats/hold", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            seatIds: [parseInt(seatId)]
+                        })
+                    });
+
+                    if (res.status === 401) {
+                        window.location.href = "/login";
+                        return;
+                    }
+
+                    if (!res.ok) {
+                        const err = await res.text();
+                        alert("Không thể giữ ghế: " + err);
+                        location.reload(); // reload để cập nhật trạng thái mới nhất
+                        return;
+                    }
+
+                    // Hold thành công → cập nhật UI
+                    selectedSeats.push({ id: seatId, name: seatName, price });
+                    btn.classList.remove("available", "pending");
+                    btn.classList.add("selected");
+                    renderBill();
+
+                } catch (err) {
+                    alert("Lỗi kết nối: " + err.message);
+                }
+            }
+        });
+    });
+
+    function renderBill() {
+        if (selectedSeats.length === 0) {
+            selectedSeatsText.textContent = "Chưa chọn";
+            totalPriceText.textContent    = "0";
+            seatInputs.innerHTML          = "";
+            return;
+        }
+
+        selectedSeatsText.textContent =
+            selectedSeats.map(s => s.name).join(", ");
+
+        const total = selectedSeats.reduce((sum, s) => sum + s.price, 0);
+        totalPriceText.textContent =
+            total.toLocaleString("vi-VN");
+
+        // Tạo hidden inputs cho form submit
+        seatInputs.innerHTML = selectedSeats
+            .map(s => `<input type="hidden" name="seatIds" value="${s.id}">`)
+            .join("");
+    }
+
+    // Gọi API hold trước khi submit form
+    // Submit form chỉ cần gửi seatIds, không cần hold lại
+    document.querySelector("form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        if (selectedSeats.length === 0) {
+            alert("Vui lòng chọn ít nhất 1 ghế!");
+            return;
+        }
+
+        e.target.submit();
+    });
+
+</script>
+
+</body>
+</html>

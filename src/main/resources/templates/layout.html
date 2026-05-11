@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <title layout:title-pattern="$LAYOUT_TITLE - Bus Booking">
+        Bus Booking
+    </title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <style>
+
+        body{
+            background:#f4f6f9;
+        }
+
+        /* NAVBAR */
+        .navbar{
+            background: linear-gradient(90deg,#1f2937,#111827);
+            padding: 14px 28px;
+            box-shadow:0 4px 18px rgba(0,0,0,0.12);
+        }
+
+        .navbar-brand{
+            font-size:1.35rem;
+            font-weight:700;
+            letter-spacing:.5px;
+        }
+
+        .navbar-brand i{
+            font-size:1.4rem;
+        }
+
+        /* MENU */
+        .nav-link{
+            color:#e5e7eb !important;
+            font-weight:500;
+            padding:10px 16px !important;
+            border-radius:10px;
+            transition:all .2s ease;
+        }
+
+        .nav-link:hover{
+            background:rgba(255,255,255,0.08);
+            color:#fff !important;
+        }
+
+        /* USER BUTTON */
+        .user-dropdown{
+            background:rgba(255,255,255,0.08);
+            padding:8px 14px !important;
+            border-radius:12px;
+        }
+
+        .user-dropdown:hover{
+            background:rgba(255,255,255,0.15);
+        }
+
+        /* DROPDOWN */
+        .dropdown-menu{
+            border:none;
+            border-radius:16px;
+            min-width:230px;
+            padding:10px;
+            margin-top:12px;
+            box-shadow:0 10px 30px rgba(0,0,0,0.12);
+        }
+
+        .dropdown-item{
+            padding:12px 14px;
+            border-radius:10px;
+            font-weight:500;
+            transition:all .2s;
+        }
+
+        .dropdown-item:hover{
+            background:#f3f4f6;
+            transform:translateX(3px);
+        }
+
+        .dropdown-divider{
+            margin:8px 0;
+        }
+
+        /* CONTENT */
+        .main-container{
+            margin-top:30px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+
+    <!-- BRAND -->
+    <a class="navbar-brand" href="/home">
+        <i class="fa fa-bus text-warning mr-2"></i>
+        Bus Booking
+    </a>
+
+    <!-- TOGGLE -->
+    <button class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarContent">
+
+        <span class="navbar-toggler-icon"></span>
+
+    </button>
+
+    <div class="collapse navbar-collapse"
+         id="navbarContent">
+
+        <!-- LEFT -->
+        <ul class="navbar-nav mr-auto">
+
+            <li class="nav-item">
+                <a href="/tickets/my-tickets"
+                   class="nav-link">
+
+                    <i class="fa fa-ticket mr-1"></i>
+                    Vé của tôi
+
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/lookup"
+                   class="nav-link">
+
+                    <i class="fa fa-search mr-1"></i>
+                    Tra cứu vé
+
+                </a>
+            </li>
+
+        </ul>
+
+        <!-- USER -->
+        <div class="dropdown"
+             th:if="${session.USER != null}">
+
+            <a class="nav-link dropdown-toggle text-white font-weight-bold user-dropdown"
+               href="#"
+               id="userDropdown"
+               role="button"
+               data-toggle="dropdown">
+
+                <i class="fa fa-user-circle mr-2"></i>
+
+                <!-- ADMIN -->
+                <span th:if="${session.USER.role.name() == 'ADMIN'}"
+                      th:text="${#strings.capitalize(session.USER.username)}">
+                </span>
+
+                <!-- USER -->
+                <span th:if="${session.USER.role.name() != 'ADMIN'}"
+                      th:text="${session.USER.userProfile != null
+                      ? session.USER.userProfile.fullName
+                      : session.USER.username}">
+                </span>
+
+            </a>
+
+            <!-- DROPDOWN -->
+            <div class="dropdown-menu dropdown-menu-right">
+
+                <!-- ADMIN -->
+                <th:block th:if="${session.USER.role.name() == 'ADMIN'}">
+
+                    <a class="dropdown-item"
+                       th:href="@{/admin}">
+
+                        <i class="fa fa-cogs mr-2"></i>
+                        Trang quản trị
+
+                    </a>
+
+                </th:block>
+
+                <!-- USER -->
+                <th:block th:if="${session.USER.role.name() != 'ADMIN'}">
+
+                    <a class="dropdown-item"
+                       th:href="@{/profile}">
+
+                        <i class="fa fa-user mr-2"></i>
+                        Thông tin cá nhân
+
+                    </a>
+
+                    <a class="dropdown-item"
+                       th:href="@{/profile/change-password}">
+
+                        <i class="fa fa-lock mr-2"></i>
+                        Đổi mật khẩu
+
+                    </a>
+
+                </th:block>
+
+                <div class="dropdown-divider"></div>
+
+                <a class="dropdown-item text-danger"
+                   th:href="@{/logout}">
+
+                    <i class="fa fa-sign-out mr-2"></i>
+                    Đăng xuất
+
+                </a>
+
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- CONTENT -->
+<div class="container main-container">
+
+    <div layout:fragment="content">
+
+    </div>
+
+</div>
+
+<!-- JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<th:block layout:fragment="scripts"></th:block>
+
+</body>
+</html>

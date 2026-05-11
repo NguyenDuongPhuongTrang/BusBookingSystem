@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý xe</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body {
+            background: #f4f6f9;
+        }
+
+        .sidebar {
+            height: 100vh;
+            background: #343a40;
+        }
+
+        .sidebar a {
+            color: white;
+            display: block;
+            padding: 12px 20px;
+        }
+
+        .sidebar a:hover {
+            background: #495057;
+            text-decoration: none;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .page-title {
+            font-weight: 700;
+            color: #343a40;
+        }
+
+        .btn {
+            border-radius: 10px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body style="background:#f4f6f9;">
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- SIDEBAR -->
+        <div class="col-md-2 sidebar p-0">
+            <h4 class="text-center py-3 text-white">ADMIN SYSTEM</h4>
+
+            <a th:href="@{/admin}">
+                <i class="fa fa-home"></i> Trang chủ
+            </a>
+
+            <a th:href="@{/admin/users}">
+                <i class="fa fa-users"></i> Quản lý người dùng
+            </a>
+
+            <a th:href="@{/admin/buses}">
+                <i class="fa fa-bus"></i> Quản lý xe
+            </a>
+
+            <a th:href="@{/admin/drivers}" class="bg-secondary">
+                <i class="fa fa-bus"></i> Quản lý tài xế
+            </a>
+
+            <a th:href="@{/admin/trips}">
+                <i class="fa fa-route"></i> Quản lý chuyến đi
+            </a>
+
+            <a href="/logout">
+                <i class="fa fa-sign-out-alt"></i> Đăng xuất
+            </a>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="col-md-10 p-4">
+            <!-- HEADER -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="page-title mb-0">
+                    <i class="fa fa-id-card"></i> Quản lý tài xế
+                </h3>
+
+                <div>
+                    👤
+                    <span th:text="${#strings.capitalize(session.USER.username)}">
+                    </span>
+                </div>
+            </div>
+
+            <!-- ACTION -->
+            <div class="mb-3 d-flex justify-content-end">
+                <a th:href="@{/admin/drivers/create}" class="btn btn-primary shadow-sm">
+                    <i class="fa fa-plus"></i>
+                    Thêm tài xế
+                </a>
+            </div>
+
+            <!-- SUCCESS -->
+            <div th:if="${success}"
+                 class="alert alert-success shadow-sm"
+                 th:text="${success}">
+            </div>
+
+            <!-- TABLE -->
+            <div class="card shadow">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover text-center">
+                            <thead class="thead-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Họ tên</th>
+                                <th>SĐT</th>
+                                <th>Bằng lái</th>
+                                <th>Địa chỉ</th>
+                                <th>Trạng thái</th>
+                                <th>Hành động</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            <tr th:each="driver : ${driverPage.content}">
+                                <td th:text="${driver.id}"></td>
+                                <td th:text="${driver.fullName}"></td>
+                                <td th:text="${driver.phone}"></td>
+                                <td th:text="${driver.licenseNumber}"></td>
+                                <td th:text="${driver.address}"></td>
+                                <td>
+                                <span class="badge"
+                                      th:classappend="${driver.active} ? 'badge-success' : 'badge-danger'"
+                                      th:text="${driver.active} ? 'Hoạt động' : 'Đã khóa'">
+                                </span>
+                                </td>
+                                <td>
+
+                                    <!-- EDIT -->
+                                    <a th:href="@{/admin/drivers/edit/{id}(id=${driver.id})}"
+                                       class="btn btn-warning btn-sm">
+
+                                        <i class="fa fa-edit"></i>
+
+                                    </a>
+
+                                    <!-- TOGGLE -->
+                                    <a th:href="@{/admin/drivers/toggle/{id}(id=${driver.id})}"
+                                       class="btn btn-sm"
+
+                                       th:classappend="${driver.active}? 'btn-secondary': 'btn-success'">
+
+                                        <i class="fa"
+                                           th:classappend="${driver.active}? ' fa-lock': ' fa-lock-open'">
+                                        </i>
+
+                                    </a>
+
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- PAGINATION -->
+                        <div class="d-flex justify-content-center mt-4">
+
+                            <ul class="pagination">
+
+                                <li class="page-item"
+                                    th:classappend="${driverPage.first} ? 'disabled'">
+
+                                    <a class="page-link"
+                                       th:href="@{/admin/drivers(page=${driverPage.number - 1})}">
+                                        Previous
+                                    </a>
+                                </li>
+
+                                <li class="page-item"
+                                    th:each="i : ${#numbers.sequence(0, driverPage.totalPages - 1)}"
+                                    th:classappend="${i == driverPage.number} ? 'active'">
+
+                                    <a class="page-link"
+                                       th:text="${i + 1}"
+                                       th:href="@{/admin/drivers(page=${i})}">
+                                    </a>
+                                </li>
+
+                                <li class="page-item"
+                                    th:classappend="${driverPage.last} ? 'disabled'">
+
+                                    <a class="page-link"
+                                       th:href="@{/admin/drivers(page=${driverPage.number + 1})}">
+                                        Next
+                                    </a>
+                                </li>
+
+                            </ul>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--JS-->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

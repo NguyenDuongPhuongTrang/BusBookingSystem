@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm tài xế</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body{
+            background: #f4f6f9;
+            min-height: 100vh;
+        }
+
+        .card{
+            border: none;
+            border-radius: 18px;
+            overflow: hidden;
+        }
+
+        .card-header{
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 20px;
+            border: none;
+        }
+
+        .card-header h3{
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .card-body{
+            padding: 35px;
+        }
+
+        .form-control{
+            border-radius: 10px;
+            height: 45px;
+        }
+
+        .form-control:focus{
+            box-shadow: none;
+            border-color: #007bff;
+        }
+
+        label{
+            font-weight: 600;
+            color: #343a40;
+        }
+
+        .btn{
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+
+        .text-danger{
+            font-size: 14px;
+        }
+
+        .form-group{
+            margin-bottom: 22px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+
+            <div class="card shadow-lg">
+
+                <!-- HEADER -->
+                <div class="card-header">
+                    <h3>
+                        <i class="fa fa-user"></i>&nbsp;Thêm tài xế
+                    </h3>
+                </div>
+
+                <!-- BODY -->
+                <div class="card-body">
+
+                    <form th:action="@{/admin/drivers/create}"
+                          method="post"
+                          th:object="${driverDTO}">
+
+                        <!-- FULL NAME -->
+                        <div class="form-group">
+                            <label>
+                                <i class="fa fa-user"></i>&nbsp;Họ tên
+                            </label>
+
+                            <input type="text"
+                                   th:field="*{fullName}"
+                                   class="form-control"
+                                   placeholder="Nhập họ tên tài xế">
+
+                            <small class="text-danger"
+                                   th:errors="*{fullName}">
+                            </small>
+                        </div>
+
+                        <!-- PHONE -->
+                        <div class="form-group">
+                            <label>
+                                <i class="fa fa-phone"></i>&nbsp;Số điện thoại
+                            </label>
+
+                            <input type="text"
+                                   th:field="*{phone}"
+                                   class="form-control"
+                                   placeholder="Nhập số điện thoại">
+
+                            <small class="text-danger"
+                                   th:errors="*{phone}">
+                            </small>
+                        </div>
+
+                        <!-- LICENSE -->
+                        <div class="form-group">
+                            <label>
+                                <i class="fa fa-id-card"></i>&nbsp;Số bằng lái
+                            </label>
+
+                            <input type="text"
+                                   th:field="*{licenseNumber}"
+                                   class="form-control"
+                                   placeholder="Nhập số bằng lái">
+
+                            <small class="text-danger"
+                                   th:errors="*{licenseNumber}">
+                            </small>
+                        </div>
+
+                        <!-- ADDRESS -->
+                        <div class="form-group">
+                            <label>
+                                <i class="fa fa-location-dot"></i>&nbsp;Địa chỉ
+                            </label>
+
+                            <input type="text"
+                                   th:field="*{address}"
+                                   class="form-control"
+                                   placeholder="Nhập địa chỉ">
+
+                            <small class="text-danger"
+                                   th:errors="*{address}">
+                            </small>
+                        </div>
+
+                        <!-- BUTTON -->
+                        <div class="d-flex justify-content-between mt-4">
+
+                            <a th:href="@{/admin/drivers}"
+                               class="btn btn-outline-secondary">
+                                <i class="fa fa-arrow-left"></i>&nbsp;Quay lại
+                            </a>
+
+                            <button class="btn btn-primary">
+                                <i class="fa fa-plus"></i>&nbsp;Thêm tài xế
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

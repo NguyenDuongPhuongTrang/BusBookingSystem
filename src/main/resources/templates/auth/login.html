@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <!-- Font Awesome (icon) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .login-card {
+            border-radius: 15px;
+        }
+
+        .form-control {
+            border-radius: 10px;
+        }
+
+        .btn {
+            border-radius: 10px;
+        }
+
+        .toggle-password {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="d-flex justify-content-center align-items-center vh-100">
+<div class="col-md-4 col-sm-8">
+    <div class="card shadow-lg login-card">
+        <div class="card-body p-4">
+
+            <h3 class="text-center mb-4">Đăng nhập</h3>
+
+            <!-- ERROR -->
+            <div class="alert alert-danger"
+                 th:if="${error}"
+                 th:text="${error}">
+            </div>
+
+            <form th:action="@{/login}" method="post" th:object="${req}">
+
+                <!-- USERNAME -->
+                <div class="form-group">
+                    <label><i class="fa fa-user"></i> Username</label>
+                    <input class="form-control" th:field="*{username}" placeholder="Nhập username">
+                    <small class="text-danger" th:errors="*{username}"></small>
+                </div>
+
+                <!-- PASSWORD -->
+                <div class="form-group">
+                    <label><i class="fa fa-lock"></i> Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" th:field="*{password}" id="password">
+                        <div class="input-group-append">
+                            <span class="input-group-text toggle-password" onclick="togglePassword()">
+                                <i class="fa fa-eye" id="eyeIcon"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <small class="text-danger" th:errors="*{password}"></small>
+                </div>
+
+                <button class="btn btn-primary btn-block mt-3">Đăng nhập</button>
+            </form>
+
+            <!-- REGISTER -->
+            <div class="text-center mt-3">
+                <a th:href="@{/register}">Chưa có tài khoản? Đăng ký</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS -->
+<script>
+    function togglePassword() {
+        const input = document.getElementById("password");
+        const icon = document.getElementById("eyeIcon");
+
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            input.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
+    }
+</script>
+
+</body>
+</html>

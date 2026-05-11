@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Đặt vé thành công</title>
+
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+</head>
+
+<body style="background:#f4f6f9;">
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-7">
+
+            <div class="card shadow-sm border-0 text-center">
+
+                <div class="card-body p-5">
+
+                    <h1 class="text-success">
+                        🎉 Đặt vé thành công
+                    </h1>
+
+                    <p class="mt-3 text-muted">
+
+                        Vé của bạn đang chờ thanh toán
+
+                    </p>
+
+                    <hr>
+
+                    <!-- TICKET CODE -->
+
+                    <h4 class="mb-3">
+
+                        Mã vé của bạn
+
+                    </h4>
+
+                    <div class="alert alert-primary">
+
+                        <h2 class="mb-0 font-weight-bold"
+                            th:text="${ticket.ticketCode}">
+                        </h2>
+
+                    </div>
+
+                    <p class="text-danger">
+
+                        ⚠ Vui lòng lưu lại mã vé để tra cứu
+
+                    </p>
+
+                    <!-- STATUS -->
+
+                    <div class="mb-4">
+
+                        <span class="badge badge-warning p-2">
+
+                            <span th:text="${ticket.status}">
+                            </span>
+
+                        </span>
+
+                    </div>
+
+                    <!-- BUTTONS -->
+
+                    <a href="/lookup"
+                       class="btn btn-primary">
+
+                        Tra cứu vé
+
+                    </a>
+
+                    <a href="/home"
+                       class="btn btn-outline-secondary">
+
+                        Về trang chủ
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

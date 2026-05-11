@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Vé của tôi</title>
+
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+</head>
+
+<body style="background:#f4f6f9;">
+
+<div class="container py-5">
+
+    <h2 class="mb-4">
+        🎫 Vé của tôi
+    </h2>
+
+    <div th:if="${#lists.isEmpty(tickets)}"
+         class="alert alert-info">
+
+        Bạn chưa đặt vé nào.
+
+    </div>
+
+    <div th:each="ticket : ${tickets}"
+         class="card shadow-sm mb-4 border-0">
+
+        <div class="card-body">
+
+            <!-- HEADER -->
+            <div class="d-flex justify-content-between">
+
+                <div>
+
+                    <h5>
+
+                        Mã vé:
+
+                        <span class="text-primary"
+                              th:text="${ticket.ticketCode}">
+                        </span>
+
+                    </h5>
+
+                </div>
+
+                <div>
+
+                                <span
+                                        th:if="${ticket.status.name() == 'PENDING'}"
+                                        class="badge badge-warning p-2">
+
+                                    Chờ thanh toán
+
+                                </span>
+
+                    <span
+                            th:if="${ticket.status.name() == 'PAID'}"
+                            class="badge badge-success p-2">
+
+                                    Đã thanh toán
+
+                                </span>
+
+                    <span
+                            th:if="${ticket.status.name() == 'CANCELLED'}"
+                            class="badge badge-danger p-2">
+
+                                    Đã hủy
+
+                                </span>
+
+                </div>
+
+            </div>
+
+            <hr>
+
+            <!-- ROUTE -->
+            <p>
+
+                <strong>Tuyến:</strong>
+
+                <span th:text="${ticket.trip.route.origin.name}">
+                </span>
+
+                →
+
+                <span th:text="${ticket.trip.route.destination.name}">
+                </span>
+
+            </p>
+
+            <!-- TIME -->
+            <p>
+
+                <strong>Khởi hành:</strong>
+
+                <span th:text="${#temporals.format(
+                        ticket.trip.departureTime,
+                        'HH:mm dd/MM/yyyy'
+                )}">
+                </span>
+
+            </p>
+
+            <!-- SEATS -->
+            <p>
+
+                <strong>Ghế:</strong>
+
+                <span th:each="seat : ${ticket.seats}"
+                      class="badge badge-success mr-1"
+                      th:text="${seat.seatNumber}">
+                </span>
+
+            </p>
+
+            <!-- BUS -->
+            <p>
+
+                <strong>Xe:</strong>
+
+                <span th:text="${ticket.trip.bus.licensePlate}">
+                </span>
+
+            </p>
+
+            <!-- DRIVER -->
+            <p>
+
+                <strong>Tài xế:</strong>
+
+                <span th:text="${ticket.trip.driver.fullName}">
+                </span>
+
+            </p>
+
+            <!-- TOTAL -->
+            <p>
+
+                <strong>Tổng tiền:</strong>
+
+                <span class="text-danger font-weight-bold"
+                      th:text="${#numbers.formatDecimal(
+                            ticket.totalPrice,
+                            0,
+                            'COMMA',
+                            0,
+                            'POINT'
+                      )}">
+                </span>
+
+                đ
+
+            </p>
+
+            <!-- CREATED -->
+            <p class="text-muted">
+
+                Đặt lúc:
+
+                <span th:text="${#temporals.format(
+                        ticket.createdAt,
+                        'HH:mm dd/MM/yyyy'
+                )}">
+                </span>
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Cập nhật trạng thái chuyến đi</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+
+        body{
+            background:#f4f6f9;
+            min-height:100vh;
+        }
+
+        .card{
+            border:none;
+            border-radius:18px;
+            overflow:hidden;
+        }
+
+        .card-header{
+            background:linear-gradient(135deg,#17a2b8,#138496);
+            color:white;
+            padding:20px;
+        }
+
+        .card-body{
+            padding:35px;
+        }
+
+        .form-control{
+            height:45px;
+            border-radius:10px;
+        }
+
+        .btn{
+            border-radius:10px;
+            font-weight:600;
+            padding:10px 20px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-6">
+
+            <div class="card shadow-lg">
+
+                <!-- HEADER -->
+                <div class="card-header">
+
+                    <h3 class="mb-0">
+
+                        <i class="fa fa-gear"></i>
+                        Cập nhật trạng thái
+
+                    </h3>
+
+                </div>
+
+                <!-- BODY -->
+                <div class="card-body">
+
+                    <form th:action="@{/admin/trips/status/{id}(id=${trip.id})}"
+                          method="post">
+
+                        <!-- ID -->
+                        <div class="form-group">
+
+                            <label>ID chuyến đi</label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   th:value="${trip.id}"
+                                   readonly>
+
+                        </div>
+
+                        <!-- ROUTE -->
+                        <div class="form-group">
+
+                            <label>Tuyến đường</label>
+
+                            <input type="text"
+                                   class="form-control"
+
+                                   th:value="${trip.route.origin.name + ' → ' + trip.route.destination.name}"
+
+                                   readonly>
+
+                        </div>
+
+                        <!-- STATUS -->
+                        <div class="form-group">
+
+                            <label>Trạng thái</label>
+
+                            <select name="status"
+                                    class="form-control">
+
+                                <option th:each="s : ${statuses}"
+                                        th:value="${s}"
+                                        th:text="${s}"
+                                        th:selected="${s == trip.status}">
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <!-- BUTTON -->
+                        <div class="d-flex justify-content-between mt-4">
+
+                            <a th:href="@{/admin/trips}"
+                               class="btn btn-secondary">
+
+                                <i class="fa fa-arrow-left"></i>
+                                Quay lại
+
+                            </a>
+
+                            <button class="btn btn-info">
+
+                                <i class="fa fa-save"></i>
+                                Lưu trạng thái
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

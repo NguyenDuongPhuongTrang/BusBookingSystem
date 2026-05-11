@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <title>Tra cứu vé</title>
+
+  <link rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+
+    body{
+      background:#f4f6f9;
+    }
+
+    .lookup-card{
+      border:none;
+      border-radius:18px;
+      overflow:hidden;
+    }
+
+    .lookup-header{
+      background:linear-gradient(
+              135deg,
+              #007bff,
+              #0056b3
+      );
+      color:white;
+      padding:20px;
+    }
+
+    .info-box{
+      background:#f8f9fa;
+      border-radius:12px;
+      padding:16px;
+      margin-bottom:15px;
+    }
+
+    .seat-badge{
+      background:#28a745;
+      color:white;
+      padding:8px 12px;
+      border-radius:10px;
+      margin-right:8px;
+      display:inline-block;
+      margin-bottom:8px;
+    }
+
+    .status-pending{
+      background:#ffc107;
+      color:black;
+    }
+
+    .status-paid{
+      background:#28a745;
+    }
+
+    .status-cancel{
+      background:#dc3545;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+<div class="container py-5">
+
+  <div class="row justify-content-center">
+
+    <div class="col-lg-8">
+
+      <div class="card shadow-sm lookup-card">
+
+        <!-- HEADER -->
+        <div class="lookup-header">
+
+          <h3 class="mb-0">
+            <i class="fa fa-ticket"></i>
+            Tra cứu vé
+          </h3>
+
+        </div>
+
+        <!-- BODY -->
+        <div class="card-body p-4">
+
+          <!-- FORM -->
+          <form method="post"
+                th:action="@{/lookup}"
+                th:object="${searchDTO}">
+
+            <div class="form-group">
+
+              <label>
+                Mã vé
+              </label>
+
+              <input class="form-control"
+                     th:field="*{ticketCode}"
+                     placeholder="Nhập mã vé">
+
+            </div>
+
+            <div class="form-group">
+
+              <label>
+                Số điện thoại
+              </label>
+
+              <input class="form-control"
+                     th:field="*{phone}"
+                     placeholder="Nhập số điện thoại">
+
+            </div>
+
+            <button class="btn btn-primary btn-block">
+
+              <i class="fa fa-search"></i>
+              Tra cứu vé
+
+            </button>
+
+          </form>
+
+          <!-- ERROR -->
+          <div th:if="${error}"
+               class="alert alert-danger mt-4"
+               th:text="${error}">
+          </div>
+
+          <!-- RESULT -->
+          <div th:if="${ticket != null}"
+               class="mt-5">
+
+            <hr>
+
+            <div class="d-flex justify-content-between align-items-center">
+
+              <h4>
+                🎫 Thông tin vé
+              </h4>
+
+              <div>
+
+                                <span
+                                        th:if="${ticket.status.name() == 'PENDING'}"
+                                        class="badge badge-warning p-2">
+
+                                    Chờ thanh toán
+
+                                </span>
+
+                <span
+                        th:if="${ticket.status.name() == 'PAID'}"
+                        class="badge badge-success p-2">
+
+                                    Đã thanh toán
+
+                                </span>
+
+                <span
+                        th:if="${ticket.status.name() == 'CANCELLED'}"
+                        class="badge badge-danger p-2">
+
+                                    Đã hủy
+
+                                </span>
+
+              </div>
+
+            </div>
+
+            <!-- CODE -->
+            <div class="info-box mt-4">
+
+              <h5 class="mb-3">
+                🧾 Mã vé
+              </h5>
+
+              <h3 class="text-primary"
+                  th:text="${ticket.ticketCode}">
+              </h3>
+
+            </div>
+
+            <!-- CUSTOMER -->
+            <div class="info-box">
+
+              <h5 class="mb-3">
+                👤 Khách hàng
+              </h5>
+
+              <p>
+                <strong>Họ tên:</strong>
+
+                <span th:text="${ticket.customerName}">
+                                </span>
+              </p>
+
+              <p>
+                <strong>Số điện thoại:</strong>
+
+                <span th:text="${ticket.phone}">
+                                </span>
+              </p>
+
+              <p class="mb-0">
+                <strong>Email:</strong>
+
+                <span th:text="${ticket.email}">
+                                </span>
+              </p>
+
+            </div>
+
+            <!-- ROUTE -->
+            <div class="info-box">
+
+              <h5 class="mb-3">
+                🚍 Thông tin chuyến đi
+              </h5>
+
+              <p>
+
+                <strong>Tuyến:</strong>
+
+                <span th:text="${ticket.trip.route.origin.name}">
+                                </span>
+
+                →
+
+                <span th:text="${ticket.trip.route.destination.name}">
+                                </span>
+
+              </p>
+
+              <p>
+
+                <strong>Khởi hành:</strong>
+
+                <span th:text="${#temporals.format(
+                                        ticket.trip.departureTime,
+                                        'HH:mm dd/MM/yyyy'
+                                    )}">
+                                </span>
+
+              </p>
+
+              <p>
+
+                <strong>Xe:</strong>
+
+                <span th:text="${ticket.trip.bus.licensePlate}">
+                                </span>
+
+                -
+
+                <span th:text="${ticket.trip.bus.busType}">
+                                </span>
+
+              </p>
+
+              <p class="mb-0">
+
+                <strong>Tài xế:</strong>
+
+                <span th:text="${ticket.trip.driver.fullName}">
+                                </span>
+
+              </p>
+
+            </div>
+
+            <!-- SEATS -->
+            <div class="info-box">
+
+              <h5 class="mb-3">
+                💺 Ghế đã đặt
+              </h5>
+
+              <span th:each="seat : ${ticket.seats}"
+                    class="seat-badge">
+
+                                <span th:text="${seat.seatNumber}">
+                                </span>
+
+                                -
+
+                                Tầng
+
+                                <span th:text="${seat.floor}">
+                                </span>
+
+                            </span>
+
+            </div>
+
+            <!-- TOTAL -->
+            <div class="info-box">
+
+              <h5 class="mb-3">
+                💰 Thanh toán
+              </h5>
+
+              <h4 class="text-danger mb-0">
+
+                                <span th:text="${#numbers.formatDecimal(
+                                        ticket.totalPrice,
+                                        0,
+                                        'COMMA',
+                                        0,
+                                        'POINT'
+                                    )}">
+                                </span>
+
+                đ
+
+              </h4>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

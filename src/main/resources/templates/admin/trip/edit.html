@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Cập nhật chuyến đi</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+
+        body{
+            background:#f4f6f9;
+            min-height:100vh;
+        }
+
+        .card{
+            border:none;
+            border-radius:18px;
+            overflow:hidden;
+        }
+
+        .card-header{
+            background:linear-gradient(135deg,#007bff,#0056b3);
+            color:white;
+            padding:20px;
+            border:none;
+        }
+
+        .card-header h3{
+            margin:0;
+            font-weight:700;
+        }
+
+        .card-body{
+            padding:35px;
+        }
+
+        .form-control{
+            border-radius:10px;
+            height:45px;
+            border:1px solid #ced4da;
+        }
+
+        .form-control:focus{
+            box-shadow:none;
+            border-color:#007bff;
+        }
+
+        select.form-control{
+            height:45px !important;
+        }
+
+        label{
+            font-weight:600;
+            color:#343a40;
+            margin-bottom:8px;
+        }
+
+        .btn{
+            border-radius:10px;
+            padding:10px 20px;
+            font-weight:600;
+        }
+
+        .form-group{
+            margin-bottom:22px;
+        }
+
+        .invalid-feedback{
+            display:block;
+            font-size:14px;
+        }
+
+        .alert{
+            border-radius:12px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <div class="card shadow-lg">
+
+                <!-- HEADER -->
+                <div class="card-header">
+
+                    <h3>
+
+                        <i class="fa fa-pen"></i>
+                        Cập nhật chuyến đi
+
+                    </h3>
+
+                </div>
+
+                <!-- BODY -->
+                <div class="card-body">
+
+                    <form method="post"
+                          th:action="@{/admin/trips/edit/{id}(id=${tripId})}"
+                          th:object="${tripDTO}">
+
+                        <!-- GLOBAL ERROR -->
+                        <div class="alert alert-danger"
+                             th:if="${#fields.hasGlobalErrors()}">
+
+                            <div th:each="err : ${#fields.globalErrors()}"
+                                 th:text="${err}">
+                            </div>
+
+                        </div>
+
+                        <!-- ROUTE -->
+                        <div class="form-group">
+
+                            <label>
+
+                                <i class="fa fa-road"></i>
+                                Tuyến đường
+
+                            </label>
+
+                            <select class="form-control"
+                                    th:field="*{routeId}"
+                                    th:classappend="${#fields.hasErrors('routeId')} ? 'is-invalid'">
+
+                                <option value="">
+                                    -- Chọn tuyến --
+                                </option>
+
+                                <option th:each="route : ${routes}"
+                                        th:value="${route.id}"
+                                        th:text="${route.origin.name + ' → ' + route.destination.name}">
+                                </option>
+
+                            </select>
+
+                            <div class="invalid-feedback"
+                                 th:errors="*{routeId}">
+                            </div>
+
+                        </div>
+
+                        <!-- BUS -->
+                        <div class="form-group">
+
+                            <label>
+
+                                <i class="fa fa-bus"></i>
+                                Xe
+
+                            </label>
+
+                            <select class="form-control"
+                                    th:field="*{busId}"
+                                    th:classappend="${#fields.hasErrors('busId')} ? 'is-invalid'">
+
+                                <option value="">
+                                    -- Chọn xe --
+                                </option>
+
+                                <option th:each="bus : ${buses}"
+                                        th:value="${bus.id}"
+                                        th:text="${bus.licensePlate}">
+                                </option>
+
+                            </select>
+
+                            <div class="invalid-feedback"
+                                 th:errors="*{busId}">
+                            </div>
+
+                        </div>
+
+                        <!-- DRIVER -->
+                        <div class="form-group">
+
+                            <label>
+
+                                <i class="fa fa-id-card"></i>
+                                Tài xế
+
+                            </label>
+
+                            <select class="form-control"
+                                    th:field="*{driverId}"
+                                    th:classappend="${#fields.hasErrors('driverId')} ? 'is-invalid'">
+
+                                <option value="">
+                                    -- Chọn tài xế --
+                                </option>
+
+                                <option th:each="driver : ${drivers}"
+                                        th:value="${driver.id}"
+                                        th:text="${driver.fullName}">
+                                </option>
+
+                            </select>
+
+                            <div class="invalid-feedback"
+                                 th:errors="*{driverId}">
+                            </div>
+
+                        </div>
+
+                        <!-- DEPARTURE -->
+                        <div class="form-group">
+
+                            <label>
+
+                                <i class="fa fa-clock"></i>
+                                Giờ khởi hành
+
+                            </label>
+
+                            <input type="datetime-local"
+                                   class="form-control"
+                                   th:field="*{departureTime}"
+                                   th:classappend="${#fields.hasErrors('departureTime')} ? 'is-invalid'">
+
+                            <div class="invalid-feedback"
+                                 th:errors="*{departureTime}">
+                            </div>
+
+                        </div>
+
+                        <!-- ARRIVAL -->
+                        <div class="form-group">
+
+                            <label>
+
+                                <i class="fa fa-clock"></i>
+                                Giờ đến
+
+                            </label>
+
+                            <input type="datetime-local"
+                                   class="form-control"
+                                   th:field="*{arrivalTime}"
+                                   th:classappend="${#fields.hasErrors('arrivalTime')} ? 'is-invalid'">
+
+                            <div class="invalid-feedback"
+                                 th:errors="*{arrivalTime}">
+                            </div>
+
+                        </div>
+
+                        <!-- PRICE -->
+                        <div class="form-group">
+
+                            <label>
+
+                                <i class="fa fa-money-bill"></i>
+                                Giá vé
+
+                            </label>
+
+                            <input type="number"
+                                   class="form-control"
+                                   th:field="*{price}"
+                                   th:classappend="${#fields.hasErrors('price')} ? 'is-invalid'">
+
+                            <div class="invalid-feedback"
+                                 th:errors="*{price}">
+                            </div>
+
+                        </div>
+
+                        <!-- BUTTON -->
+                        <div class="d-flex justify-content-between mt-4">
+
+                            <a th:href="@{/admin/trips}"
+                               class="btn btn-outline-secondary">
+
+                                <i class="fa fa-arrow-left"></i>
+                                Quay lại
+
+                            </a>
+
+                            <button class="btn btn-primary">
+
+                                <i class="fa fa-save"></i>
+                                Cập nhật
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
