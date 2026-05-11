@@ -1,16 +1,20 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <title>Admin Dashboard</title>
 
     <meta charset="utf-8">
+    <title>Báo cáo thống kê</title>
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap 4 -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
     <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
 
@@ -21,6 +25,13 @@
         .sidebar {
             height: 100vh;
             background: #343a40;
+
+            position: fixed;
+            top: 0;
+            left: 0;
+
+            width: 16.666667%; /* tương đương col-md-2 */
+            overflow-y: auto;
         }
 
         .sidebar a {
@@ -34,15 +45,23 @@
             text-decoration: none;
         }
 
-        .card {
-            border-radius: 15px;
-        }
-
         .page-title {
             font-weight: 700;
             color: #343a40;
         }
+
+        .stat-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        }
+
+        .main-content {
+            margin-left: 16.666667%;
+        }
+
     </style>
+
 </head>
 
 <body>
@@ -52,9 +71,11 @@
 
         <!-- SIDEBAR -->
         <div class="col-md-2 sidebar p-0">
-            <h4 class="text-center py-3 text-white">ADMIN SYSTEM</h4>
+            <h4 class="text-center py-3 text-white">
+                ADMIN SYSTEM
+            </h4>
 
-            <a th:href="@{/admin}" class="bg-secondary">
+            <a th:href="@{/admin}">
                 <i class="fa fa-home"></i> Trang chủ
             </a>
 
@@ -67,139 +88,171 @@
             </a>
 
             <a th:href="@{/admin/drivers}">
-                <i class="fa fa-bus"></i> Quản lý tài xế
+                <i class="fa fa-id-card"></i> Quản lý tài xế
             </a>
 
             <a th:href="@{/admin/trips}">
                 <i class="fa fa-route"></i> Quản lý chuyến đi
             </a>
 
+            <a th:href="@{/admin/dashboard}" class="bg-secondary">
+                <i class="fa fa-chart-bar"></i> Báo cáo thống kê
+            </a>
+
             <a href="/logout">
                 <i class="fa fa-sign-out-alt"></i> Đăng xuất
             </a>
+
         </div>
 
-        <!-- MAIN CONTENT -->
-        <div class="col-md-10 p-4">
-
-            <!-- HEADER -->
+        <!-- MAIN -->
+        <div class="col-md-10 p-4 main-content">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h3 class="page-title mb-0">
-                    <i class="fa fa-home"></i> &nbsp;Trang chủ
+                    <i class="fa fa-chart-bar"></i>
+                    Báo cáo thống kê
                 </h3>
-                <a class="nav-link dropdown-toggle font-weight-bold"
-                   href="#"
-                   id="userDropdown"
-                   role="button"
-                   data-toggle="dropdown">
+
+                <div>
                     👤
                     <span th:text="${#strings.capitalize(session.USER.username)}"></span>
-                </a>
-
-                <div class="dropdown-menu dropdown-menu-right">
-                    <a class="dropdown-item"
-                       th:href="@{/profile/change-password}">
-                        <i class="fa fa-lock"></i>
-                        Đổi mật khẩu
-                    </a>
                 </div>
+
             </div>
 
-            <!-- CARDS -->
+            <!-- STATS -->
+            <div class="row mb-4">
+
+                <div class="col-md-4">
+                    <div class="card stat-card p-3 text-center">
+                        <h5>Doanh thu tháng này</h5>
+                        <h3 class="text-success"
+                            th:text="${#numbers.formatDecimal(
+                                    revenueByMonth.isEmpty() ? 0 : revenueByMonth[revenueByMonth.size()-1].revenue,
+                                    0, 'COMMA', 0, 'POINT'
+                                )} + ' đ'">
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card stat-card p-3 text-center">
+                        <h5>Tuyến hot nhất</h5>
+                        <h3 class="text-primary"
+                            th:text="${revenueByRoute.isEmpty() ? 'N/A' : revenueByRoute[0].routeName}">
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card stat-card p-3 text-center">
+                        <h5>Chuyến nhiều vé nhất</h5>
+                        <h3 class="text-danger"
+                            th:text="${topTrips.isEmpty() ? 'N/A' : topTrips[0].routeName}">
+                        </h3>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CHARTS -->
             <div class="row">
 
-                <!-- HOME -->
-                <div class="col-md-4 mb-4 mt-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body text-center">
-                            <i class="fa fa-home fa-3x text-danger mb-3"></i>
-                            <h5>Trang chủ hệ thống</h5>
-                            <p class="text-muted">Quản lý trang chủ hệ thống</p>
-                            <a th:href="@{/home}" class="btn btn-danger">
-                                Truy cập ngay
-                            </a>
-                        </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card p-3 shadow-sm">
+                        <h5>📅 Doanh thu theo tháng</h5>
+                        <canvas id="monthChart"></canvas>
                     </div>
                 </div>
 
-                <!-- CREATE BUSES -->
-                <div class="col-md-4 mb-4 mt-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body text-center">
-                            <i class="fa fa-bus fa-3x text-info mb-3"></i>
-                            <h5>Quản lý xe</h5>
-                            <p class="text-muted">Quản lý xe bus trong hệ thống</p>
-                            <a th:href="@{/admin/buses}" class="btn btn-info">
-                                Xem ngay
-                            </a>
-                        </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card p-3 shadow-sm">
+                        <h5>🛣 Doanh thu theo tuyến</h5>
+                        <canvas id="routeChart"></canvas>
                     </div>
                 </div>
 
-                <!-- MANAGE USERS -->
-                <div class="col-md-4 mb-4 mt-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body text-center">
-                            <i class="fa fa-users fa-3x text-success mb-3"></i>
-                            <h5>Quản lý người dùng</h5>
-                            <p class="text-muted">Quản lý tài khoản user</p>
-                            <a th:href="@{/admin/users}" class="btn btn-success">
-                                Xem ngay
-                            </a>
-                        </div>
-                    </div>
-                </div>
+            </div>
 
-                <!-- MANAGE DRIVER -->
-                <div class="col-md-4 mb-4 mt-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body text-center">
-                            <i class="fa fa-id-card fa-3x text-dark mb-3"></i>
-                            <h5>Quản lý tài xế</h5>
-                            <p class="text-muted">Quản lý các tài xế đã đăng ký</p>
-                            <a th:href="@{/admin/drivers}" class="btn btn-dark">
-                                Xem ngay
-                            </a>
-                        </div>
-                    </div>
-                </div>
+            <!-- TABLE -->
+            <div class="card p-3 shadow-sm">
 
-                <!-- VIEW TRIP -->
-                <div class="col-md-4 mb-4 mt-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body text-center">
-                            <i class="fa fa-route fa-3x text-secondary mb-3"></i>
-                            <h5>Quản lý chuyến đi</h5>
-                            <p class="text-muted">Quản lý các chuyến đi</p>
-                            <a th:href="@{/admin/trips}" class="btn btn-secondary">
-                                Xem ngay
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                <h5>🏆 Top 5 chuyến phổ biến</h5>
 
-                <!-- REPORT -->
-                <div class="col-md-4 mb-4 mt-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body text-center">
-                            <i class="fa fa-chart-bar fa-3x text-warning mb-3"></i>
-                            <h5>Báo cáo</h5>
-                            <p class="text-muted">Thống kê doanh thu (sắp làm)</p>
-                            <a th:href="@{/admin/users}" class="btn btn-warning text-white">
-                                Xem ngay
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                <table class="table table-hover mt-3">
+
+                    <thead>
+                    <tr>
+                        <th>Chuyến</th>
+                        <th>Lượt đặt</th>
+                        <th>Doanh thu</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+
+                    <tr th:each="t : ${topTrips}">
+                        <td th:text="${t.routeName}"></td>
+                        <td th:text="${t.totalTickets}"></td>
+                        <td class="text-danger font-weight-bold"
+                            th:text="${#numbers.formatDecimal(t.revenue, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 
-<!--JS-->
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<!-- CHART JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script th:inline="javascript">
+
+    const revenueByMonth = /*[[${revenueByMonth}]]*/ [];
+    const revenueByRoute = /*[[${revenueByRoute}]]*/ [];
+
+    const monthLabels = revenueByMonth.map(r => r.month);
+    const monthData   = revenueByMonth.map(r => r.revenue);
+
+    const routeLabels = revenueByRoute.map(r => r.routeName);
+    const routeData   = revenueByRoute.map(r => r.revenue);
+
+    new Chart(document.getElementById('monthChart'), {
+        type: 'line',
+        data: {
+            labels: monthLabels,
+            datasets: [{
+                label: 'Doanh thu (đ)',
+                data: monthData,
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40,167,69,0.1)',
+                borderWidth: 3,
+                tension: 0.3
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    new Chart(document.getElementById('routeChart'), {
+        type: 'bar',
+        data: {
+            labels: routeLabels,
+            datasets: [{
+                label: 'Doanh thu (đ)',
+                data: routeData,
+                backgroundColor: '#007bff'
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } }
+        }
+    });
+
+</script>
 
 </body>
 </html>

@@ -12,8 +12,6 @@ import java.util.Optional;
 public interface SeatRepository extends JpaRepository<Seat, Long> {
     List<Seat> findByTripOrderBySeatNumber(Trip trip);
 
-    Optional<Seat> findByIdAndStatus(Long id, SeatStatus status);
-
     List<Seat> findByStatusAndHoldUntilBefore(
             SeatStatus status,
             LocalDateTime time

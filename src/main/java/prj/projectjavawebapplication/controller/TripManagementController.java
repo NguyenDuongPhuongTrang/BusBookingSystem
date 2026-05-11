@@ -9,11 +9,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import prj.projectjavawebapplication.enums.TripStatus;
 import prj.projectjavawebapplication.model.dto.TripDTO;
 import prj.projectjavawebapplication.model.entity.Trip;
 import prj.projectjavawebapplication.repository.TripRepository;
-import prj.projectjavawebapplication.service.*;
+import prj.projectjavawebapplication.service.BusService;
+import prj.projectjavawebapplication.service.RouteService;
+import prj.projectjavawebapplication.service.TripService;
 
 @Controller
 @RequestMapping("/admin/trips")
@@ -24,36 +27,19 @@ public class TripManagementController {
     private final TripService tripService;
     private final RouteService routeService;
     private final BusService busService;
-    private final DriverService driverService;
 
-    /*
-     * =========================
-     * LIST + PAGINATION
-     * =========================
-     */
-
+    // LIST + PAGINATION
     @GetMapping
-    public String trips(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "") String keyword,
-            Model model
-    ) {
+    public String trips(@RequestParam(defaultValue = "0") int page,
+                        @RequestParam(defaultValue = "") String keyword,
+                        Model model) {
 
         Pageable pageable = PageRequest.of(page, 5);
-
         Page<Trip> tripPage;
 
         if (keyword != null && !keyword.trim().isEmpty()) {
-
-            tripPage = tripRepository
-                    .findByRouteOriginNameContainingIgnoreCaseOrRouteDestinationNameContainingIgnoreCase(
-                            keyword,
-                            keyword,
-                            pageable
-                    );
-
+            tripPage = tripRepository.findByRouteOriginNameContainingIgnoreCaseOrRouteDestinationNameContainingIgnoreCase(keyword, keyword, pageable);
         } else {
-
             tripPage = tripRepository.findAll(pageable);
         }
 
@@ -63,65 +49,41 @@ public class TripManagementController {
         return "admin/trip/list";
     }
 
-    /*
-     * =========================
-     * CREATE
-     * =========================
-     */
-
+    // CREATE
     @GetMapping("/create")
     public String createForm(Model model) {
-
-        model.addAttribute(
-                "tripDTO",
-                new TripDTO()
-        );
-
+        model.addAttribute("tripDTO", new TripDTO());
         loadData(model);
-
         return "admin/trip/create";
     }
 
     @PostMapping("/create")
-    public String create(
-            @Valid
-            @ModelAttribute("tripDTO")
-            TripDTO dto,
-
-            BindingResult result,
-            Model model
-    ) {
+    public String create(@Valid @ModelAttribute("tripDTO") TripDTO dto,
+                         BindingResult result,
+                         Model model,
+                         RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
-
             loadData(model);
-
             return "admin/trip/create";
         }
 
         tripService.create(dto);
 
+        redirectAttributes.addFlashAttribute("success", "Thêm xe thành công!");
+
         return "redirect:/admin/trips";
     }
 
-    /*
-     * =========================
-     * EDIT
-     * =========================
-     */
-
+    // EDIT
     @GetMapping("/edit/{id}")
-    public String editForm(
-            @PathVariable Long id,
-            Model model
-    ) {
+    public String editForm(@PathVariable Long id, Model model) {
 
         Trip trip = tripService.findById(id);
 
         TripDTO dto = TripDTO.builder()
                 .routeId(trip.getRoute().getId())
                 .busId(trip.getBus().getId())
-                .driverId(trip.getDriver().getId())
                 .departureTime(trip.getDepartureTime())
                 .arrivalTime(trip.getArrivalTime())
                 .price(trip.getPrice())
@@ -136,92 +98,52 @@ public class TripManagementController {
     }
 
     @PostMapping("/edit/{id}")
-    public String update(
-            @PathVariable Long id,
-
-            @Valid
-            @ModelAttribute("tripDTO")
-            TripDTO dto,
-
-            BindingResult result,
-
-            Model model
-    ) {
+    public String update(@PathVariable Long id,
+                         @Valid @ModelAttribute("tripDTO") TripDTO dto,
+                         BindingResult result,
+                         Model model,
+                         RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
-
             model.addAttribute("tripId", id);
-
             loadData(model);
-
             return "admin/trip/edit";
         }
 
         tripService.update(id, dto);
 
+        redirectAttributes.addFlashAttribute("success", "Cập nhật chuyến đi thành công!");
+
         return "redirect:/admin/trips";
     }
 
-    /*
-     * =========================
-     * STATUS
-     * =========================
-     */
-
+    // STATUS
     @GetMapping("/status/{id}")
-    public String statusForm(
-            @PathVariable Long id,
-            Model model
-    ) {
+    public String statusForm(@PathVariable Long id, Model model) {
 
         Trip trip = tripService.findById(id);
 
         model.addAttribute("trip", trip);
-
-        model.addAttribute(
-                "statuses",
-                TripStatus.values()
-        );
+        model.addAttribute("statuses", TripStatus.values());
 
         return "admin/trip/status";
     }
 
     @PostMapping("/status/{id}")
-    public String updateStatus(
-            @PathVariable Long id,
+    public String updateStatus(@PathVariable Long id,
+                               @RequestParam TripStatus status,
+                               RedirectAttributes redirectAttributes) {
 
-            @RequestParam TripStatus status
-    ) {
+        tripService.updateStatus(id, status);
 
-        tripService.updateStatus(
-                id,
-                status
-        );
+        redirectAttributes.addFlashAttribute("success", "Cập nhật trạng thái chuyến đi thành công!");
 
         return "redirect:/admin/trips";
     }
 
-    /*
-     * =========================
-     * LOAD DATA
-     * =========================
-     */
-
+    // LOAD DATA
     private void loadData(Model model) {
-
-        model.addAttribute(
-                "routes",
-                routeService.findAll()
-        );
-
-        model.addAttribute(
-                "buses",
-                busService.findAll()
-        );
-
-        model.addAttribute(
-                "drivers",
-                driverService.findAll()
-        );
+        model.addAttribute("routes", routeService.findAll());
+        model.addAttribute("buses", busService.findAll());
     }
 }

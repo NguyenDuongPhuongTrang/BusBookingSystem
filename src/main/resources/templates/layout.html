@@ -125,13 +125,43 @@
         <!-- LEFT -->
         <ul class="navbar-nav mr-auto">
 
-            <li class="nav-item">
+            <li class="nav-item"
+                th:if="${session.USER.role.name() == 'PASSENGER'}">
+
                 <a href="/tickets/my-tickets"
                    class="nav-link">
 
                     <i class="fa fa-ticket mr-1"></i>
                     Vé của tôi
 
+                </a>
+
+            </li>
+
+            <li class="nav-item"
+                th:if="${session.USER.role.name() == 'STAFF'}">
+                <a href="/staff/tickets"
+                   class="nav-link">
+                    <i class="fa fa-clock-o mr-1"></i>
+                    Vé chờ thanh toán
+                </a>
+            </li>
+
+            <li class="nav-item"
+                th:if="${session.USER.role.name() == 'STAFF'}">
+                <a href="/staff/tickets/all"
+                   class="nav-link">
+                    <i class="fa fa-list mr-1"></i>
+                    Tất cả vé
+                </a>
+            </li>
+
+            <li class="nav-item"
+                th:if="${session.USER.role.name() == 'ADMIN'}">
+                <a href="/admin/all"
+                   class="nav-link">
+                    <i class="fa fa-list mr-1"></i>
+                    Tất cả vé
                 </a>
             </li>
 

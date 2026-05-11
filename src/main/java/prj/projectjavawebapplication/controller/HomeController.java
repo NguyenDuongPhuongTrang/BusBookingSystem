@@ -23,13 +23,11 @@ public class HomeController {
     boolean searched = false;
 
     @GetMapping("/home")
-    public String home(
-            HttpSession session,
-            Model model,
-            @RequestParam(required = false) Long fromId,
-            @RequestParam(required = false) Long toId,
-            @RequestParam(required = false) String date
-    ) {
+    public String home(HttpSession session,
+                       Model model,
+                       @RequestParam(required = false) Long fromId,
+                       @RequestParam(required = false) Long toId,
+                       @RequestParam(required = false) String date) {
 
         User user = (User) session.getAttribute("USER");
 
@@ -44,51 +42,22 @@ public class HomeController {
 
         boolean searched = false;
 
-        /*
-         * VALIDATE:
-         * phải chọn cả điểm đi + điểm đến
-         */
-
-        if ((fromId != null && toId == null)
-                || (fromId == null && toId != null)) {
-
-            model.addAttribute(
-                    "error",
-                    "Vui lòng chọn đầy đủ điểm đi và điểm đến"
-            );
-
+        if ((fromId != null && toId == null) || (fromId == null && toId != null)) {
+            model.addAttribute("error", "Vui lòng chọn đầy đủ điểm đi và điểm đến");
             model.addAttribute("trips", trips);
             model.addAttribute("searched", false);
 
             return "home";
         }
 
-        /*
-         * SEARCH
-         */
-
+        // SEARCH
         if (fromId != null && toId != null) {
-
             searched = true;
-
-            // có ngày
             if (date != null && !date.isBlank()) {
-
-                trips = tripService.searchTripsById(
-                        fromId,
-                        toId,
-                        LocalDate.parse(date)
-                );
-
+                trips = tripService.searchTripsById(fromId, toId, LocalDate.parse(date));
             }
-
-            // không có ngày
             else {
-
-                trips = tripService.searchTripsWithoutDate(
-                        fromId,
-                        toId
-                );
+                trips = tripService.searchTripsWithoutDate(fromId, toId);
             }
         }
 

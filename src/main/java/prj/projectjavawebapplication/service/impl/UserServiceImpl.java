@@ -1,5 +1,7 @@
 package prj.projectjavawebapplication.service.impl;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import prj.projectjavawebapplication.enums.Role;
@@ -36,6 +38,20 @@ public class UserServiceImpl implements UserService {
         }
 
         user.setEnabled(!user.getEnabled());
+    }
+
+    @Override
+    public Page<User> searchUsers(String keyword, Pageable pageable) {
+
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return userRepository.findByRoleNot(Role.ADMIN, pageable);
+        }
+
+        return userRepository.findByRoleNotAndUsernameContainingIgnoreCase(
+                Role.ADMIN,
+                keyword,
+                pageable
+        );
     }
 }
 

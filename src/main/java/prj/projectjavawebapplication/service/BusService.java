@@ -8,5 +8,4 @@ public interface BusService {
     List<Bus> findAll();
     Bus findById(Long id);
     void save(Bus bus);
-    void delete(Long id);
 }

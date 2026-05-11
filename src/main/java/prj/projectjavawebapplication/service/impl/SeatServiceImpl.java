@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import prj.projectjavawebapplication.enums.SeatStatus;
+import prj.projectjavawebapplication.enums.TripStatus;
 import prj.projectjavawebapplication.model.entity.Seat;
 import prj.projectjavawebapplication.model.entity.Trip;
 import prj.projectjavawebapplication.model.entity.User;
@@ -13,6 +14,7 @@ import prj.projectjavawebapplication.repository.UserRepository;
 import prj.projectjavawebapplication.service.SeatService;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -23,9 +25,6 @@ public class SeatServiceImpl implements SeatService {
     private final TripRepository tripRepository;
     private final UserRepository userRepository;
 
-    // =========================
-    // GET SEATS
-    // =========================
     @Override
     public List<Seat> getSeatsByTrip(Long tripId) {
 
@@ -34,31 +33,28 @@ public class SeatServiceImpl implements SeatService {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow();
 
-        return seatRepository.findByTripOrderBySeatNumber(trip);
+        return seatRepository.findByTripOrderBySeatNumber(trip)
+                .stream()
+                .sorted(Comparator.comparing(seat -> {
+                    String num = seat.getSeatNumber().replaceAll("[^0-9]", "");
+                    return num.isEmpty() ? 0 : Integer.parseInt(num);
+                }))
+                .toList();
     }
 
     @Override
     public Seat findById(Long id) {
-
         releaseExpiredSeats();
-
-        return seatRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Không tìm thấy ghế")
-                );
+        return seatRepository.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy ghế"));
     }
 
     @Override
     public List<Seat> findAllByIds(List<Long> ids) {
-
         releaseExpiredSeats();
-
         return seatRepository.findAllById(ids);
     }
 
-    // =========================
-    // HOLD SEATS (FIXED)
-    // =========================
+    // GIỮ GHẾ
     @Override
     @Transactional
     public void holdSeats(List<Long> seatIds, Long userId) {
@@ -77,7 +73,6 @@ public class SeatServiceImpl implements SeatService {
                 throw new RuntimeException("Ghế " + seat.getSeatNumber() + " đã được đặt");
             }
 
-            // Ghế đang được người khác giữ
             if (seat.getStatus() == SeatStatus.PENDING
                     && seat.getHoldByUser() != null
                     && !seat.getHoldByUser().getId().equals(userId)
@@ -87,18 +82,27 @@ public class SeatServiceImpl implements SeatService {
                 throw new RuntimeException("Ghế " + seat.getSeatNumber() + " đang được người khác giữ");
             }
 
-            // === HOLD HOẶC EXTEND ===
             seat.setStatus(SeatStatus.PENDING);
             seat.setHoldByUser(user);
             seat.setHoldUntil(LocalDateTime.now().plusMinutes(10));
         }
 
         seatRepository.saveAll(seats);
+
+        long availableCount = seatRepository
+                .findByTripOrderBySeatNumber(seats.get(0).getTrip())
+                .stream()
+                .filter(s -> s.getStatus() == SeatStatus.AVAILABLE)
+                .count();
+
+        if (availableCount == 0) {
+            Trip trip = seats.get(0).getTrip();
+            trip.setStatus(TripStatus.FULL);
+            tripRepository.save(trip);
+        }
     }
 
-    // =========================
-    // AUTO RELEASE EXPIRED
-    // =========================
+    // TỰ ĐỘNG HẾT HẠN
     private void releaseExpiredSeats() {
 
         List<Seat> expiredSeats =

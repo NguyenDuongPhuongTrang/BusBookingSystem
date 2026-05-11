@@ -12,8 +12,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class DriverServiceImpl
-        implements DriverService {
+public class DriverServiceImpl implements DriverService {
 
     private final DriverRepository driverRepository;
 

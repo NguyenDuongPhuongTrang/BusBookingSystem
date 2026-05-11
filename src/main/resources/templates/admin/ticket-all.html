@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý tất cả vé</title>
+</head>
+
+<body style="background:#f4f6f9;">
+
+<div layout:fragment="content">
+    <div class="card shadow-sm">
+        <!-- HEADER -->
+        <div class="card-header bg-dark text-white">
+            <h4 class="mb-0">📋 Tất cả vé</h4>
+        </div>
+
+        <!-- TABLE -->
+        <div class="card-body">
+            <table class="table table-hover table-bordered">
+                <thead class="thead-light">
+                <tr>
+                    <th>Mã vé</th>
+                    <th>Khách hàng</th>
+                    <th>SĐT</th>
+                    <th>Chuyến</th>
+                    <th>Ghế</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="ticket : ${tickets}">
+                    <!-- Mã vé -->
+                    <td class="font-weight-bold text-primary"
+                        th:text="${ticket.ticketCode}">
+                    </td>
+
+                    <!-- Khách hàng -->
+                    <td th:text="${ticket.customerName}">
+                    </td>
+
+                    <!-- SĐT -->
+                    <td th:text="${ticket.phone}">
+                    </td>
+
+                    <!-- Tuyến -->
+                    <td>
+                        <span th:text="${ticket.trip.route.origin.name}"></span>
+                        →
+                        <span th:text="${ticket.trip.route.destination.name}"></span>
+                    </td>
+
+                    <!-- Ghế -->
+                    <td>
+                        <span class="badge badge-secondary mr-1"
+                              th:each="seat : ${ticket.seats}"
+                              th:text="${seat.seatNumber}">
+                        </span>
+                    </td>
+
+                    <!-- Tiền -->
+                    <td class="text-danger font-weight-bold">
+                        <span th:text="${#numbers.formatDecimal(
+                                ticket.totalPrice,
+                                0,
+                                'COMMA',
+                                0,
+                                'POINT'
+                        )}"></span> đ
+                    </td>
+
+                    <!-- Trạng thái -->
+                    <td>
+                        <span th:if="${ticket.status.name() == 'PENDING'}"
+                              class="badge badge-warning">
+                            Chờ thanh toán
+                        </span>
+
+                        <span th:if="${ticket.status.name() == 'PAID'}"
+                              class="badge badge-success">
+                            Đã thanh toán
+                        </span>
+
+                        <span th:if="${ticket.status.name() == 'CANCELLED'}"
+                              class="badge badge-danger">
+                            Đã hủy
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -2,6 +2,7 @@ package prj.projectjavawebapplication.model.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import prj.projectjavawebapplication.validation.TripTimeConstraint;
 
 import java.math.BigDecimal;
@@ -23,14 +24,13 @@ public class TripDTO {
     @NotNull(message = "Vui lòng chọn xe")
     private Long busId;
 
-    @NotNull(message = "Vui lòng chọn tài xế")
-    private Long driverId;
-
     @NotNull(message = "Vui lòng chọn giờ khởi hành")
     @Future(message = "Giờ khởi hành phải ở tương lai")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime departureTime;
 
     @NotNull(message = "Vui lòng chọn giờ đến")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime arrivalTime;
 
     @NotNull(message = "Giá vé không được để trống")

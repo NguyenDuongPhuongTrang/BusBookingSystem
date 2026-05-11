@@ -9,7 +9,6 @@ import java.util.List;
 @Getter
 @Setter
 public class BookingDTO {
-
     @NotEmpty(message = "Vui lòng chọn ghế")
     private List<Long> seatIds;
 }

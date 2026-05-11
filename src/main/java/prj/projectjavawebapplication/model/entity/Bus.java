@@ -26,6 +26,8 @@ public class Bus {
 
     private String companyName;
 
+    private Boolean active = true;
+
     @ManyToOne
     @JoinColumn(name = "driver_id")
     private Driver driver;

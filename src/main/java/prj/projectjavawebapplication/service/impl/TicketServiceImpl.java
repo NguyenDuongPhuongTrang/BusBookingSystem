@@ -41,18 +41,14 @@ public class TicketServiceImpl implements TicketService {
         LocalDateTime now = LocalDateTime.now();
 
         for (Seat seat : seats) {
-
-            // ❌ không phải ghế đang pending
             if (seat.getStatus() != SeatStatus.PENDING) {
                 throw new RuntimeException("Ghế " + seat.getSeatNumber() + " không hợp lệ");
             }
 
-            // ❌ hết hạn giữ
             if (seat.getHoldUntil() == null || seat.getHoldUntil().isBefore(now)) {
                 throw new RuntimeException("Ghế " + seat.getSeatNumber() + " đã hết giữ");
             }
 
-            // ❌ không phải người giữ
             if (seat.getHoldByUser() == null ||
                     !seat.getHoldByUser().getId().equals(user.getId())) {
                 throw new RuntimeException("Ghế " + seat.getSeatNumber() + " không thuộc về bạn");
@@ -130,7 +126,11 @@ public class TicketServiceImpl implements TicketService {
     public void cancelTicket(Long id) {
 
         Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy vé"));
+
+        if (ticket.getStatus() == TicketStatus.CANCELLED) {
+            throw new RuntimeException("Vé đã bị hủy");
+        }
 
         ticket.setStatus(TicketStatus.CANCELLED);
 
@@ -142,5 +142,10 @@ public class TicketServiceImpl implements TicketService {
 
         seatRepository.saveAll(ticket.getSeats());
         ticketRepository.save(ticket);
+    }
+
+    @Override
+    public List<Ticket> getAllTickets() {
+        return ticketRepository.findAllByOrderByCreatedAtDesc();
     }
 }

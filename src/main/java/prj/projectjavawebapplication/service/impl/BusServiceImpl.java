@@ -29,16 +29,9 @@ public class BusServiceImpl implements BusService {
 
     @Override
     public void save(Bus bus) {
-
         if (bus.getCreatedAt() == null) {
             bus.setCreatedAt(LocalDateTime.now());
         }
-
         busRepository.save(bus);
-    }
-
-    @Override
-    public void delete(Long id) {
-        busRepository.deleteById(id);
     }
 }

@@ -18,15 +18,10 @@ public class SeatController {
 
     private final SeatService seatService;
 
-    /*
-     * SEAT MAP
-     */
-
     @GetMapping("/trips/{tripId}/seats")
-    public String seats(
-            @PathVariable Long tripId,
-            Model model,
-            HttpSession session) {
+    public String seats(@PathVariable Long tripId,
+                        Model model,
+                        HttpSession session) {
 
         User currentUser = (User) session.getAttribute("USER");
 
@@ -43,10 +38,7 @@ public class SeatController {
 
     @PostMapping("/seats/hold")
     @ResponseBody
-    public ResponseEntity<?> holdSeats(
-            @RequestBody HoldSeatDTO request,
-            HttpSession session) {
-
+    public ResponseEntity<?> holdSeats(@RequestBody HoldSeatDTO request, HttpSession session) {
         User currentUser = (User) session.getAttribute("USER");
 
         if (currentUser == null) {

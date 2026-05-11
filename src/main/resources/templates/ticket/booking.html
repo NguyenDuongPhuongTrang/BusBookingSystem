@@ -15,27 +15,17 @@
 <body style="background:#f4f6f9;">
 
 <div class="container mt-5">
-
     <div class="row justify-content-center">
-
         <div class="col-md-8">
-
             <div class="card shadow-sm border-0">
-
                 <div class="card-header bg-primary text-white">
-
                     <h4 class="mb-0">
                         🎫 Xác nhận đặt vé
                     </h4>
-
                 </div>
 
                 <div class="card-body">
-
-                    <form method="post"
-                          th:action="@{/tickets/confirm}"
-                          th:object="${bookingDTO}">
-
+                    <form method="post" th:action="@{/tickets/confirm}" th:object="${bookingDTO}">
                         <!-- SEAT IDS -->
                         <div th:each="id : ${bookingDTO.seatIds}">
 
@@ -46,68 +36,44 @@
                         </div>
 
                         <!-- CUSTOMER INFO -->
-
                         <div class="form-group">
-
-                            <label>
-                                Họ tên
-                            </label>
-
+                            <label>Họ tên</label>
                             <input class="form-control"
                                    th:value="${profile.fullName}"
                                    readonly>
-
                         </div>
 
                         <div class="form-group">
-
-                            <label>
-                                Số điện thoại
-                            </label>
-
+                            <label>Số điện thoại</label>
                             <input class="form-control"
                                    th:value="${profile.phone}"
                                    readonly>
-
                         </div>
 
                         <div class="form-group">
-
-                            <label>
-                                Email
-                            </label>
-
+                            <label>Email</label>
                             <input class="form-control"
                                    th:value="${profile.email}"
                                    readonly>
-
                         </div>
-
                         <hr>
 
                         <!-- SELECTED SEATS -->
-
                         <h5 class="mb-3">
                             Ghế đã chọn
                         </h5>
 
                         <div class="mb-4">
-
                             <span class="badge badge-success p-2 mr-2"
                                   th:each="seat : ${seats}"
                                   th:text="${seat.seatNumber}">
                             </span>
-
                         </div>
 
                         <!-- TOTAL -->
-
                         <div class="alert alert-info">
-
                             Tổng tiền:
-
                             <strong class="text-danger">
-
                                 <span th:text="${#numbers.formatDecimal(
                                     total,
                                     0,
@@ -115,30 +81,18 @@
                                     0,
                                     'POINT'
                                 )}">
-                                </span>
-
-                                đ
-
+                                </span>đ
                             </strong>
-
                         </div>
 
                         <button class="btn btn-primary btn-lg btn-block">
-
                             Xác nhận đặt vé
-
                         </button>
-
                     </form>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 </body>

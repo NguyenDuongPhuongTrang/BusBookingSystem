@@ -92,11 +92,7 @@
 
                 <!-- BODY -->
                 <div class="card-body">
-
-                    <form th:action="@{/admin/drivers/edit/{id}(id=${driverId})}"
-                          method="post"
-                          th:object="${driverDTO}">
-
+                    <form th:action="@{/admin/drivers/edit/{id}(id=${driverId})}" method="post" th:object="${driverDTO}">
                         <!-- FULL NAME -->
                         <div class="form-group">
                             <label>
@@ -172,19 +168,12 @@
                             <button class="btn btn-warning">
                                 <i class="fa fa-pen"></i>&nbsp;Cập nhật
                             </button>
-
                         </div>
-
                     </form>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 </body>

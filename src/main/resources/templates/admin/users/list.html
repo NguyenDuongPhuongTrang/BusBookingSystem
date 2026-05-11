@@ -5,7 +5,6 @@
 <head>
 
     <meta charset="UTF-8">
-
     <title>Quản lý người dùng</title>
 
     <!-- Bootstrap -->
@@ -17,97 +16,116 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        body{
-            background:#f4f6f9;
+
+        body {
+            background: #f4f6f9;
         }
 
         /* SIDEBAR */
-        .sidebar{
-            height:100vh;
-            background:#343a40;
+        .sidebar {
+            height: 100vh;
+            background: #343a40;
         }
 
-        .sidebar a{
-            color:white;
-            display:block;
-            padding:12px 20px;
-            transition:0.2s;
+        .sidebar a {
+            color: white;
+            display: block;
+            padding: 12px 20px;
+            transition: 0.2s;
         }
 
-        .sidebar a:hover{
-            background:#495057;
-            text-decoration:none;
+        .sidebar a:hover {
+            background: #495057;
+            text-decoration: none;
         }
 
         /* CARD */
-        .card{
-            border:none;
-            border-radius:15px;
-            overflow:hidden;
+        .card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
         }
 
-        .page-title{
-            font-weight:700;
-            color:#343a40;
+        .page-title {
+            font-weight: 700;
+            color: #343a40;
         }
 
-        .table{
-            margin-bottom:0;
+        .table thead {
+            background: #343a40;
+            color: white;
         }
 
-        .table thead{
-            background:#343a40;
-            color:white;
+        .table thead th {
+            border: none;
+            padding: 15px;
         }
 
-        .table thead th{
-            border:none;
-            padding:15px;
-            vertical-align:middle;
+        .table tbody tr:hover {
+            background: #f8f9fa;
         }
 
-        .table tbody td{
-            vertical-align:middle;
-            padding:14px;
+        .btn {
+            border-radius: 10px;
+            font-weight: 500;
         }
 
-        .table tbody tr:hover{
-            background:#f8f9fa;
-            transition:0.2s;
+        .badge {
+            padding: 7px 12px;
+            border-radius: 20px;
         }
 
-        .btn{
-            border-radius:10px;
-            font-weight:500;
+        /* PAGINATION STYLE - UNIFIED */
+        .pagination {
+            margin-top: 20px;
         }
 
-        .badge{
-            padding:7px 12px;
-            border-radius:20px;
-            font-size:13px;
+        .pagination .page-item {
+            margin: 0 4px;
         }
 
-        .form-control{
-            border-radius:10px;
-            height:45px;
+        .pagination .page-link {
+            border: none;
+            border-radius: 10px;
+            padding: 8px 14px;
+            color: #343a40;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            transition: all 0.2s ease;
         }
 
-        .form-control:focus{
-            box-shadow:none;
+        .pagination .page-link:hover {
+            background: #343a40;
+            color: #fff;
+            transform: translateY(-1px);
         }
 
-        .table-responsive{
-            border-radius:15px;
+        .pagination .active .page-link {
+            background: #343a40;
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .pagination .disabled .page-link {
+            opacity: 0.5;
+            pointer-events: none;
+            background: #f1f1f1;
         }
 
     </style>
+
 </head>
 
 <body>
+
 <div class="container-fluid">
+
     <div class="row">
+
         <!-- SIDEBAR -->
         <div class="col-md-2 sidebar p-0">
+
             <h4 class="text-center py-3 text-white">ADMIN SYSTEM</h4>
 
             <a th:href="@{/admin}">
@@ -123,69 +141,96 @@
             </a>
 
             <a th:href="@{/admin/drivers}">
-                <i class="fa fa-bus"></i> Quản lý tài xế
+                <i class="fa fa-id-card"></i> Quản lý tài xế
             </a>
 
             <a th:href="@{/admin/trips}">
                 <i class="fa fa-route"></i> Quản lý chuyến đi
             </a>
 
+            <a th:href="@{/admin/dashboard}">
+                <i class="fa fa-chart-bar"></i> Báo cáo thống kê
+            </a>
+
             <a href="/logout">
                 <i class="fa fa-sign-out-alt"></i> Đăng xuất
             </a>
+
         </div>
 
-        <!-- MAIN CONTENT -->
+        <!-- MAIN -->
         <div class="col-md-10 p-4">
+
             <!-- HEADER -->
             <div class="d-flex justify-content-between align-items-center mb-4">
+
                 <h3 class="page-title mb-0">
-                    <i class="fa fa-users"></i> &nbsp;Quản lý người dùng
+                    <i class="fa fa-users"></i> Quản lý người dùng
                 </h3>
 
                 <div>
                     👤
-                    <span th:text="${#strings.capitalize(session.USER.username)}">
-                    </span>
+                    <span th:text="${#strings.capitalize(session.USER.username)}"></span>
                 </div>
+
             </div>
 
-            <!-- ALERT -->
+            <div class="card shadow-sm mb-3">
+
+                <div class="card-body d-flex justify-content-between align-items-center">
+
+                    <!-- SEARCH -->
+                    <form method="get" th:action="@{/admin/users}" class="w-50">
+
+                        <div class="input-group">
+
+                            <input type="text"
+                                   name="keyword"
+                                   class="form-control"
+                                   placeholder="Tìm username..."
+                                   th:value="${keyword}">
+
+                            <div class="input-group-append">
+                                <button class="btn btn-dark">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                    <!-- ADD -->
+                    <a th:href="@{/admin/create-user}"
+                       class="btn btn-primary shadow-sm">
+
+                        <i class="fa fa-plus"></i>
+                        Thêm tài khoản
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- SUCCESS -->
             <div th:if="${success}"
                  class="alert alert-success shadow-sm"
                  th:text="${success}">
             </div>
 
-            <div th:if="${error}"
-                 class="alert alert-danger shadow-sm"
-                 th:text="${error}">
-            </div>
-
-            <!-- SEARCH -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-body d-flex justify-content-between">
-                    <form method="get" th:action="@{/admin/users}">
-                        <div class="input-group">
-                            <input type="text" name="keyword" th:value="${keyword}" class="form-control" placeholder="Tìm username...">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary">
-                                    <i class="fa fa-search"></i>&nbsp;Tìm kiếm
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                    <a th:href="@{/admin/create-user}" class="btn btn-primary mt-1">
-                        <i class="fa fa-plus"></i>&nbsp;Tạo ngay
-                    </a>
-                </div>
-            </div>
 
             <!-- TABLE -->
             <div class="card shadow">
+
                 <div class="card-body p-0">
+
                     <div class="table-responsive">
-                        <table class="table table-hover text-center">
+
+                        <table class="table table-hover text-center mb-0">
+
                             <thead>
+
                             <tr>
                                 <th>ID</th>
                                 <th>Username</th>
@@ -194,45 +239,66 @@
                                 <th>Ngày tạo</th>
                                 <th>Hành động</th>
                             </tr>
+
                             </thead>
+
                             <tbody>
+
                             <tr th:each="user : ${users}">
+
                                 <td th:text="${user.id}"></td>
-                                <td class="font-weight-bold" th:text="${user.username}"></td>
+
+                                <td class="font-weight-bold"
+                                    th:text="${user.username}">
+                                </td>
+
                                 <td>
-                                    <span th:if="${user.role.name() == 'STAFF'}" class="badge badge-warning">
+
+                                    <span th:if="${user.role.name() == 'ADMIN'}"
+                                          class="badge badge-danger">
+                                        ADMIN
+                                    </span>
+
+                                    <span th:if="${user.role.name() == 'STAFF'}"
+                                          class="badge badge-warning">
                                         STAFF
                                     </span>
 
-                                    <span th:if="${user.role.name() == 'PASSENGER'}" class="badge badge-info">
+                                    <span th:if="${user.role.name() == 'PASSENGER'}"
+                                          class="badge badge-info">
                                         PASSENGER
                                     </span>
 
-                                    <span th:if="${user.role.name() == 'ADMIN'}" class="badge badge-danger">
-                                        ADMIN
-                                    </span>
                                 </td>
+
                                 <td>
-                                    <span th:if="${user.enabled}" class="badge badge-success">
+
+                                    <span th:if="${user.enabled}"
+                                          class="badge badge-success">
                                         Hoạt động
                                     </span>
 
-                                    <span th:unless="${user.enabled}" class="badge badge-secondary">
+                                    <span th:unless="${user.enabled}"
+                                          class="badge badge-secondary">
                                         Đã khóa
                                     </span>
+
                                 </td>
+
                                 <td th:text="${#temporals.format(user.createdAt,'dd/MM/yyyy HH:mm')}"></td>
+
                                 <td>
+
                                     <a th:href="@{/admin/users/toggle/{id}(id=${user.id})}"
-                                       th:classappend="${user.enabled}
-                                       ? 'btn-danger'
-                                       : 'btn-success'"
-                                       class="btn btn-sm">
+                                       class="btn btn-sm"
+                                       th:classappend="${user.enabled} ? 'btn-danger' : 'btn-success'">
+
                                         <span th:if="${user.enabled}">
-                                            <i class="fa fa-lock"></i>&nbsp;Khóa
+                                            <i class="fa fa-lock"></i> Khóa
                                         </span>
+
                                         <span th:unless="${user.enabled}">
-                                            <i class="fa fa-unlock"></i>&nbsp;Mở khóa
+                                            <i class="fa fa-unlock"></i> Mở
                                         </span>
                                     </a>
                                 </td>
@@ -240,11 +306,48 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- PAGINATION -->
+                    <div class="d-flex justify-content-center mt-4 mb-3">
+                        <ul class="pagination">
+                            <!-- PREV -->
+                            <li class="page-item"
+                                th:classappend="${userPage.first} ? 'disabled'">
+
+                                <a class="page-link"
+                                   th:href="@{/admin/users(page=${userPage.number - 1}, keyword=${keyword})}">
+                                    Previous
+                                </a>
+                            </li>
+
+                            <!-- NUMBERS -->
+                            <li class="page-item"
+                                th:each="i : ${#numbers.sequence(0, userPage.totalPages - 1)}"
+                                th:classappend="${i == userPage.number} ? 'active'">
+
+                                <a class="page-link"
+                                   th:text="${i + 1}"
+                                   th:href="@{/admin/users(page=${i}, keyword=${keyword})}">
+                                </a>
+                            </li>
+
+                            <!-- NEXT -->
+                            <li class="page-item"
+                                th:classappend="${userPage.last} ? 'disabled'">
+
+                                <a class="page-link"
+                                   th:href="@{/admin/users(page=${userPage.number + 1}, keyword=${keyword})}">
+                                    Next
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 </body>
 
 </html>

@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
 
 <head>
 
@@ -7,139 +9,76 @@
 
     <title>Quản lý vé</title>
 
-    <link rel="stylesheet"
-          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-
 </head>
 
 <body style="background:#f4f6f9;">
 
-<div class="container py-5">
-
-    <div class="card shadow-sm border-0">
-
-        <div class="card-header bg-dark text-white">
-
-            <h4 class="mb-0">
-                🎫 Vé chờ thanh toán
-            </h4>
-
-        </div>
-
-        <div class="card-body">
-
-            <table class="table table-bordered">
-
-                <thead class="thead-light">
-
-                <tr>
-
-                    <th>Mã vé</th>
-
-                    <th>Khách hàng</th>
-
-                    <th>SĐT</th>
-
-                    <th>Ghế</th>
-
-                    <th>Tổng tiền</th>
-
-                    <th>Trạng thái</th>
-
-                    <th width="220">
-                        Hành động
-                    </th>
-
-                </tr>
-
-                </thead>
-
-                <tbody>
-
-                <tr th:each="ticket : ${tickets}">
-
-                    <td th:text="${ticket.ticketCode}">
-                    </td>
-
-                    <td th:text="${ticket.customerName}">
-                    </td>
-
-                    <td th:text="${ticket.phone}">
-                    </td>
-
-                    <td>
-
-                        <span th:each="seat : ${ticket.seats}"
-                              th:text="${seat.seatNumber + ' '}">
-                        </span>
-
-                    </td>
-
-                    <td>
-
-                        <span th:text="${#numbers.formatDecimal(
-                            ticket.totalPrice,
-                            0,
-                            'COMMA',
-                            0,
-                            'POINT'
-                        )}">
-                        </span>
-
-                        đ
-
-                    </td>
-
-                    <td>
-
-                        <span class="badge badge-warning">
-
-                            PENDING
-
-                        </span>
-
-                    </td>
-
-                    <td>
-
-                        <!-- CONFIRM -->
-                        <form method="post"
-                              th:action="@{/staff/tickets/{id}/confirm(id=${ticket.id})}"
-                              style="display:inline-block;">
-
-                            <button class="btn btn-success btn-sm">
-
-                                Xác nhận
-
-                            </button>
-
-                        </form>
-
-                        <!-- CANCEL -->
-                        <form method="post"
-                              th:action="@{/staff/tickets/{id}/cancel(id=${ticket.id})}"
-                              style="display:inline-block;">
-
-                            <button class="btn btn-danger btn-sm">
-
-                                Hủy vé
-
-                            </button>
-
-                        </form>
-
-                    </td>
-
-                </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
+<div layout:fragment="content">
+    <div class="card-header bg-dark text-white">
+        <h4 class="mb-0">
+            <span th:if="${viewAll == true}">📋 Tất cả vé</span>
+            <span th:if="${viewAll == false}">🎫 Vé chờ thanh toán</span>
+        </h4>
     </div>
 
+    <div class="card-body">
+        <table class="table table-bordered">
+            <thead class="thead-light">
+            <tr>
+                <th>Mã vé</th>
+                <th>Khách hàng</th>
+                <th>SĐT</th>
+                <th>Ghế</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th th:if="${viewAll == false}">Hành động</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="ticket : ${tickets}">
+                <td th:text="${ticket.ticketCode}"></td>
+                <td th:text="${ticket.customerName}"></td>
+                <td th:text="${ticket.phone}"></td>
+                <td>
+                    <span th:each="seat : ${ticket.seats}"
+                          th:text="${seat.seatNumber + ' '}">
+                    </span>
+                </td>
+                <td>
+                    <span th:text="${#numbers.formatDecimal(
+                        ticket.totalPrice,
+                        0,
+                        'COMMA',
+                        0,
+                        'POINT'
+                    )}">
+                    </span>đ
+                </td>
+                <td>
+                    <span th:if="${ticket.status.name() == 'PENDING'}" class="badge badge-warning">Chờ thanh toán</span>
+                    <span th:if="${ticket.status.name() == 'PAID'}" class="badge badge-success">Đã thanh toán</span>
+                    <span th:if="${ticket.status.name() == 'CANCELLED'}" class="badge badge-danger">Đã hủy</span>
+                </td>
+                <td th:if="${viewAll == false}">
+                    <form th:if="${ticket.status.name() == 'PENDING'}"
+                          method="post"
+                          th:action="@{/staff/tickets/{id}/confirm(id=${ticket.id})}"
+                          style="display:inline-block;">
+                        <button class="btn btn-success btn-sm">Xác nhận</button>
+                    </form>
+
+                    <form th:if="${ticket.status.name() != 'CANCELLED'}"
+                          method="post"
+                          th:action="@{/staff/tickets/{id}/cancel(id=${ticket.id})}"
+                          style="display:inline-block;">
+                        <button class="btn btn-danger btn-sm">Hủy vé</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 </body>

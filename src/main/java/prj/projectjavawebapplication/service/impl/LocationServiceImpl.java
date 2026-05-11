@@ -11,7 +11,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class LocationServiceImpl implements LocationService {
-
     private final LocationRepository locationRepository;
 
     @Override

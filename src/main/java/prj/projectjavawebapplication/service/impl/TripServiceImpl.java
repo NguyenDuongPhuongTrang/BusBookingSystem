@@ -25,36 +25,25 @@ public class TripServiceImpl
     private final DriverRepository driverRepository;
     private final SeatRepository seatRepository;
 
-    @Override
-    public List<Trip> searchTripsById(
-            Long fromId,
-            Long toId,
-            LocalDate date
-    ) {
-        return tripRepository.searchTripsById(
-                fromId,
-                toId,
-                date.atStartOfDay(),
-                date.plusDays(1).atStartOfDay()
+    public List<Trip> searchTripsById(Long fromId, Long toId, LocalDate date) {
+        return tripRepository.findByRouteOriginIdAndRouteDestinationIdAndStatusIn(
+                fromId, toId,
+                List.of(TripStatus.OPEN, TripStatus.FULL),
+                date
         );
     }
 
-    @Override
-    public List<Trip> searchTripsWithoutDate(
-            Long fromId,
-            Long toId
-    ) {
-
-        return tripRepository.searchTripsWithoutDate(
-                fromId,
-                toId
+    public List<Trip> searchTripsWithoutDate(Long fromId, Long toId) {
+        return tripRepository.findByRouteOriginIdAndRouteDestinationIdAndStatusIn(
+                fromId, toId,
+                List.of(TripStatus.OPEN, TripStatus.FULL)
         );
     }
 
-    @Override
     public List<Trip> findAll() {
-
-        return tripRepository.findAll();
+        return tripRepository.findByStatusIn(
+                List.of(TripStatus.OPEN, TripStatus.FULL)
+        );
     }
 
     @Override
@@ -74,13 +63,12 @@ public class TripServiceImpl
         Bus bus = busRepository.findById(dto.getBusId())
                 .orElseThrow();
 
-        Driver driver = driverRepository.findById(dto.getDriverId())
-                .orElseThrow();
+        Driver driver = bus.getDriver();
 
         Trip trip = Trip.builder()
                 .route(route)
                 .bus(bus)
-                .driver(driver)
+                .driver(bus.getDriver())
                 .departureTime(dto.getDepartureTime())
                 .arrivalTime(dto.getArrivalTime())
                 .price(dto.getPrice())
@@ -103,28 +91,19 @@ public class TripServiceImpl
     }
 
     @Override
-    public void update(
-            Long id,
-            TripDTO dto
-    ) {
+    public void update(Long id, TripDTO dto) {
 
         Trip trip = findById(id);
 
-        Route route = routeRepository.findById(
-                dto.getRouteId()
-        ).orElseThrow();
+        Route route = routeRepository.findById(dto.getRouteId())
+                .orElseThrow();
 
-        Bus bus = busRepository.findById(
-                dto.getBusId()
-        ).orElseThrow();
-
-        Driver driver = driverRepository.findById(
-                dto.getDriverId()
-        ).orElseThrow();
+        Bus bus = busRepository.findById(dto.getBusId())
+                .orElseThrow();
 
         trip.setRoute(route);
         trip.setBus(bus);
-        trip.setDriver(driver);
+        trip.setDriver(bus.getDriver());
         trip.setDepartureTime(dto.getDepartureTime());
         trip.setArrivalTime(dto.getArrivalTime());
         trip.setPrice(dto.getPrice());
@@ -133,15 +112,9 @@ public class TripServiceImpl
     }
 
     @Override
-    public void updateStatus(
-            Long id,
-            TripStatus status
-    ) {
-
+    public void updateStatus(Long id, TripStatus status) {
         Trip trip = findById(id);
-
         trip.setStatus(status);
-
         tripRepository.save(trip);
     }
 }

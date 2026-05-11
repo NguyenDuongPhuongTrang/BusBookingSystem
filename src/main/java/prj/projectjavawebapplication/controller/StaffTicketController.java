@@ -13,46 +13,32 @@ public class StaffTicketController {
 
     private final TicketService ticketService;
 
-    /*
-     * LIST PENDING
-     */
-
+    // LIST PENDING
     @GetMapping
-    public String pendingTickets(Model model){
-
-        model.addAttribute(
-                "tickets",
-                ticketService.getPendingTickets()
-        );
-
+    public String pendingTickets(Model model) {
+        model.addAttribute("tickets", ticketService.getPendingTickets());
+        model.addAttribute("viewAll", false);
         return "staff/ticket-list";
     }
 
-    /*
-     * CONFIRM
-     */
-
+    // CONFIRM
     @PostMapping("/{id}/confirm")
-    public String confirm(
-            @PathVariable Long id
-    ){
-
+    public String confirm(@PathVariable Long id){
         ticketService.confirmTicket(id);
-
         return "redirect:/staff/tickets";
     }
 
-    /*
-     * CANCEL
-     */
-
+    // CANCEL
     @PostMapping("/{id}/cancel")
-    public String cancel(
-            @PathVariable Long id
-    ){
-
+    public String cancel(@PathVariable Long id){
         ticketService.cancelTicket(id);
-
         return "redirect:/staff/tickets";
+    }
+
+    @GetMapping("/all")
+    public String allTickets(Model model) {
+        model.addAttribute("tickets", ticketService.getAllTickets());
+        model.addAttribute("viewAll", true);
+        return "staff/ticket-list";
     }
 }

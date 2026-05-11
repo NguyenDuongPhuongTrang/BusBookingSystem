@@ -33,14 +33,12 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     @Override
     public void register(RegisterDTO dto) {
-        //  kiểm tra mật khẩu
         if (!dto.getPassword().equals(dto.getConfirmPassword())) {
             throw new RuntimeException("Mật khẩu không khớp");
         }
-        // kiểm tra username, email, phone
+
         validateUnique(dto.getUsername(), dto.getEmail(), dto.getPhone());
 
-        // lưu user
         User user = new User();
         user.setUsername(dto.getUsername());
         user.setPasswordHash(encoder.encode(dto.getPassword()));
@@ -50,7 +48,6 @@ public class AuthServiceImpl implements AuthService {
 
         user = userRepo.save(user);
 
-        // lưu profile
         UserProfile profile = new UserProfile();
         profile.setUser(user);
         profile.setFullName(dto.getFullName());
@@ -80,7 +77,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void createByAdmin(CreateUserDTO dto) {
-        // kiểm tra username, email, phone
         validateUnique(dto.getUsername(), dto.getEmail(), dto.getPhone());
 
         User user = new User();

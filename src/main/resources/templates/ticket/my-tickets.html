@@ -22,130 +22,83 @@
 
     <div th:if="${#lists.isEmpty(tickets)}"
          class="alert alert-info">
-
         Bạn chưa đặt vé nào.
-
     </div>
 
-    <div th:each="ticket : ${tickets}"
-         class="card shadow-sm mb-4 border-0">
-
+    <div th:each="ticket : ${tickets}" class="card shadow-sm mb-4 border-0">
         <div class="card-body">
 
             <!-- HEADER -->
             <div class="d-flex justify-content-between">
-
                 <div>
-
                     <h5>
-
                         Mã vé:
-
                         <span class="text-primary"
                               th:text="${ticket.ticketCode}">
                         </span>
-
                     </h5>
-
                 </div>
 
                 <div>
+                    <span th:if="${ticket.status.name() == 'PENDING'}" class="badge badge-warning p-2">
+                        Chờ thanh toán
+                    </span>
 
-                                <span
-                                        th:if="${ticket.status.name() == 'PENDING'}"
-                                        class="badge badge-warning p-2">
+                    <span th:if="${ticket.status.name() == 'PAID'}" class="badge badge-success p-2">
+                        Đã thanh toán
+                    </span>
 
-                                    Chờ thanh toán
-
-                                </span>
-
-                    <span
-                            th:if="${ticket.status.name() == 'PAID'}"
-                            class="badge badge-success p-2">
-
-                                    Đã thanh toán
-
-                                </span>
-
-                    <span
-                            th:if="${ticket.status.name() == 'CANCELLED'}"
-                            class="badge badge-danger p-2">
-
-                                    Đã hủy
-
-                                </span>
+                    <span th:if="${ticket.status.name() == 'CANCELLED'}" class="badge badge-danger p-2">
+                        Đã hủy
+                    </span>
 
                 </div>
-
             </div>
 
             <hr>
 
             <!-- ROUTE -->
             <p>
-
                 <strong>Tuyến:</strong>
-
-                <span th:text="${ticket.trip.route.origin.name}">
-                </span>
-
+                <span th:text="${ticket.trip.route.origin.name}"></span>
                 →
-
-                <span th:text="${ticket.trip.route.destination.name}">
-                </span>
-
+                <span th:text="${ticket.trip.route.destination.name}"></span>
             </p>
 
             <!-- TIME -->
             <p>
-
                 <strong>Khởi hành:</strong>
-
                 <span th:text="${#temporals.format(
                         ticket.trip.departureTime,
                         'HH:mm dd/MM/yyyy'
                 )}">
                 </span>
-
             </p>
 
             <!-- SEATS -->
             <p>
-
                 <strong>Ghế:</strong>
-
                 <span th:each="seat : ${ticket.seats}"
                       class="badge badge-success mr-1"
                       th:text="${seat.seatNumber}">
                 </span>
-
             </p>
 
             <!-- BUS -->
             <p>
-
                 <strong>Xe:</strong>
-
-                <span th:text="${ticket.trip.bus.licensePlate}">
-                </span>
-
+                <span th:text="${ticket.trip.bus.licensePlate}"></span>
             </p>
 
             <!-- DRIVER -->
             <p>
-
                 <strong>Tài xế:</strong>
-
-                <span th:text="${ticket.trip.driver.fullName}">
-                </span>
-
+                <span th:text="${ticket.trip.driver.fullName}"></span>
             </p>
 
             <!-- TOTAL -->
             <p>
-
                 <strong>Tổng tiền:</strong>
-
                 <span class="text-danger font-weight-bold"
                       th:text="${#numbers.formatDecimal(
                             ticket.totalPrice,
@@ -154,30 +107,79 @@
                             0,
                             'POINT'
                       )}">
-                </span>
-
-                đ
-
+                </span>đ
             </p>
 
             <!-- CREATED -->
             <p class="text-muted">
-
                 Đặt lúc:
-
                 <span th:text="${#temporals.format(
                         ticket.createdAt,
                         'HH:mm dd/MM/yyyy'
                 )}">
                 </span>
-
             </p>
 
-        </div>
+            <button class="btn btn-danger btn-sm"
+                    th:if="${ticket.status.name() == 'PENDING' || ticket.status.name() == 'PAID'}"
+                    data-toggle="modal"
+                    th:attr="data-target='#cancelModal__' + ${ticket.id}">
+                Hủy vé
+            </button>
 
+        </div>
     </div>
 
-</div>
+    <div th:each="ticket : ${tickets}">
+        <div class="modal fade"
+             th:id="'cancelModal__' + ${ticket.id}"
+             tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Xác nhận huỷ vé</h5>
+                    </div>
 
+                    <div class="modal-body">
+
+                        <p th:if="${ticket.status.name() == 'PAID'}"
+                           class="text-danger">
+                            ⚠ Vé đã thanh toán sẽ không được hoàn tiền.
+                            Bạn chắc chắn muốn huỷ?
+                        </p>
+
+                        <p th:if="${ticket.status.name() == 'PENDING'}">
+                            Bạn có chắc chắn muốn huỷ vé này?
+                        </p>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <form th:action="@{'/tickets/cancel/' + ${ticket.id}}"
+                              method="post">
+
+                            <button type="button"
+                                    class="btn btn-secondary"
+                                    data-dismiss="modal">
+                                Không huỷ
+                            </button>
+
+                            <button type="submit"
+                                    class="btn btn-danger">
+                                Xác nhận huỷ
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Thêm trước </body> -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
 </body>
 </html>

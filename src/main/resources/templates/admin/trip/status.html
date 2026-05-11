@@ -57,62 +57,41 @@
 <body>
 
 <div class="container py-5">
-
     <div class="row justify-content-center">
-
         <div class="col-md-6">
-
             <div class="card shadow-lg">
-
                 <!-- HEADER -->
                 <div class="card-header">
-
                     <h3 class="mb-0">
-
                         <i class="fa fa-gear"></i>
                         Cập nhật trạng thái
-
                     </h3>
-
                 </div>
 
                 <!-- BODY -->
                 <div class="card-body">
-
-                    <form th:action="@{/admin/trips/status/{id}(id=${trip.id})}"
-                          method="post">
-
+                    <form th:action="@{/admin/trips/status/{id}(id=${trip.id})}" method="post">
                         <!-- ID -->
                         <div class="form-group">
-
                             <label>ID chuyến đi</label>
-
                             <input type="text"
                                    class="form-control"
                                    th:value="${trip.id}"
                                    readonly>
-
                         </div>
 
                         <!-- ROUTE -->
                         <div class="form-group">
-
                             <label>Tuyến đường</label>
-
                             <input type="text"
                                    class="form-control"
-
                                    th:value="${trip.route.origin.name + ' → ' + trip.route.destination.name}"
-
                                    readonly>
-
                         </div>
 
                         <!-- STATUS -->
                         <div class="form-group">
-
                             <label>Trạng thái</label>
-
                             <select name="status"
                                     class="form-control">
 
@@ -123,39 +102,26 @@
                                 </option>
 
                             </select>
-
                         </div>
 
                         <!-- BUTTON -->
                         <div class="d-flex justify-content-between mt-4">
-
                             <a th:href="@{/admin/trips}"
                                class="btn btn-secondary">
-
                                 <i class="fa fa-arrow-left"></i>
                                 Quay lại
-
                             </a>
 
                             <button class="btn btn-info">
-
                                 <i class="fa fa-save"></i>
                                 Lưu trạng thái
-
                             </button>
-
                         </div>
-
                     </form>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 </body>

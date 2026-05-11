@@ -92,31 +92,20 @@
 <body>
 
 <div class="container py-5">
-
     <div class="row justify-content-center">
-
         <div class="col-md-8">
-
             <div class="card shadow-lg">
 
                 <!-- HEADER -->
                 <div class="card-header">
-
                     <h3>
-
-                        <i class="fa fa-route"></i>
-                        Thêm chuyến đi
-
+                        <i class="fa fa-route"></i>  Thêm chuyến đi
                     </h3>
-
                 </div>
 
                 <!-- BODY -->
                 <div class="card-body">
-
-                    <form method="post"
-                          th:object="${tripDTO}">
-
+                    <form method="post" th:object="${tripDTO}">
                         <!-- GLOBAL ERROR -->
                         <div class="alert alert-danger"
                              th:if="${#fields.hasGlobalErrors()}">
@@ -124,17 +113,12 @@
                             <div th:each="err : ${#fields.globalErrors()}"
                                  th:text="${err}">
                             </div>
-
                         </div>
 
                         <!-- ROUTE -->
                         <div class="form-group">
-
                             <label>
-
-                                <i class="fa fa-road"></i>
-                                Tuyến đường
-
+                                <i class="fa fa-road"></i>  Tuyến đường
                             </label>
 
                             <select class="form-control"
@@ -155,79 +139,34 @@
                             <div class="invalid-feedback"
                                  th:errors="*{routeId}">
                             </div>
-
                         </div>
 
                         <!-- BUS -->
                         <div class="form-group">
+                            <label>Xe</label>
 
-                            <label>
+                            <select id="busSelect"
+                                    class="form-control"
+                                    th:field="*{busId}">
 
-                                <i class="fa fa-bus"></i>
-                                Xe
-
-                            </label>
-
-                            <select class="form-control"
-                                    th:field="*{busId}"
-                                    th:classappend="${#fields.hasErrors('busId')} ? 'is-invalid'">
-
-                                <option value="">
-                                    -- Chọn xe --
-                                </option>
+                                <option value="">-- Chọn xe --</option>
 
                                 <option th:each="bus : ${buses}"
                                         th:value="${bus.id}"
-                                        th:text="${bus.licensePlate}">
+                                        th:data-driver="${bus.driver.fullName}"
+                                        th:text="${bus.licensePlate + ' - ' + bus.driver.fullName}">
                                 </option>
 
                             </select>
 
-                            <div class="invalid-feedback"
-                                 th:errors="*{busId}">
-                            </div>
-
-                        </div>
-
-                        <!-- DRIVER -->
-                        <div class="form-group">
-
-                            <label>
-
-                                <i class="fa fa-id-card"></i>
-                                Tài xế
-
-                            </label>
-
-                            <select class="form-control"
-                                    th:field="*{driverId}"
-                                    th:classappend="${#fields.hasErrors('driverId')} ? 'is-invalid'">
-
-                                <option value="">
-                                    -- Chọn tài xế --
-                                </option>
-
-                                <option th:each="driver : ${drivers}"
-                                        th:value="${driver.id}"
-                                        th:text="${driver.fullName}">
-                                </option>
-
-                            </select>
-
-                            <div class="invalid-feedback"
-                                 th:errors="*{driverId}">
-                            </div>
-
+                            <div id="driverInfo" class="mt-2 text-primary font-weight-bold"></div>
                         </div>
 
                         <!-- DEPARTURE -->
                         <div class="form-group">
-
                             <label>
-
                                 <i class="fa fa-clock"></i>
                                 Giờ khởi hành
-
                             </label>
 
                             <input type="datetime-local"
@@ -238,17 +177,13 @@
                             <div class="invalid-feedback"
                                  th:errors="*{departureTime}">
                             </div>
-
                         </div>
 
                         <!-- ARRIVAL -->
                         <div class="form-group">
-
                             <label>
-
                                 <i class="fa fa-clock"></i>
                                 Giờ đến
-
                             </label>
 
                             <input type="datetime-local"
@@ -259,17 +194,13 @@
                             <div class="invalid-feedback"
                                  th:errors="*{arrivalTime}">
                             </div>
-
                         </div>
 
                         <!-- PRICE -->
                         <div class="form-group">
-
                             <label>
-
                                 <i class="fa fa-money-bill"></i>
                                 Giá vé
-
                             </label>
 
                             <input type="number"
@@ -280,41 +211,48 @@
                             <div class="invalid-feedback"
                                  th:errors="*{price}">
                             </div>
-
                         </div>
 
                         <!-- BUTTON -->
                         <div class="d-flex justify-content-between mt-4">
-
                             <a th:href="@{/admin/trips}"
                                class="btn btn-outline-secondary">
-
                                 <i class="fa fa-arrow-left"></i>
                                 Quay lại
-
                             </a>
 
                             <button class="btn btn-primary">
-
                                 <i class="fa fa-plus"></i>
                                 Thêm chuyến đi
-
                             </button>
-
                         </div>
-
                     </form>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
+<!--JS-->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
+<script>
+    function updateDriverInfo() {
+        const select = document.getElementById("busSelect");
+        const selected = select.options[select.selectedIndex];
+        const driver = selected.getAttribute("data-driver");
+
+        document.getElementById("driverInfo").innerText =
+            driver ? "Tài xế: " + driver : "";
+    }
+
+    // khi chọn xe
+    document.getElementById("busSelect").addEventListener("change", updateDriverInfo);
+
+    // khi load trang (QUAN TRỌNG)
+    window.addEventListener("load", updateDriverInfo);
+</script>
 </body>
 
 </html>

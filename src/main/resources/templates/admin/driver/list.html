@@ -50,6 +50,44 @@
             border-radius: 10px;
             font-weight: 500;
         }
+
+        /* PAGINATION STYLE - UNIFIED */
+        .pagination {
+            margin-top: 20px;
+        }
+
+        .pagination .page-item {
+            margin: 0 4px;
+        }
+
+        .pagination .page-link {
+            border: none;
+            border-radius: 10px;
+            padding: 8px 14px;
+            color: #343a40;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            transition: all 0.2s ease;
+        }
+
+        .pagination .page-link:hover {
+            background: #343a40;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .pagination .active .page-link {
+            background: #343a40;
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .pagination .disabled .page-link {
+            opacity: 0.5;
+            pointer-events: none;
+            background: #f1f1f1;
+        }
     </style>
 </head>
 
@@ -79,6 +117,10 @@
 
             <a th:href="@{/admin/trips}">
                 <i class="fa fa-route"></i> Quản lý chuyến đi
+            </a>
+
+            <a th:href="@{/admin/dashboard}" >
+                <i class="fa fa-chart-bar"></i> Báo cáo thống kê
             </a>
 
             <a href="/logout">

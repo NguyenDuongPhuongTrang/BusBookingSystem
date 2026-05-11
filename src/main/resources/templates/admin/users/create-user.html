@@ -1,40 +1,139 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>Tạo tài khoản</title>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap 4 -->
+    <!-- Bootstrap -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <!-- FontAwesome -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
-        body {
-            background: #f5f6fa;
+
+        body{
+            background:#f4f6f9;
+            min-height:100vh;
+            display:flex;
+            align-items:center;
         }
 
-        .card {
-            border-radius: 12px;
+        .card{
+            border:none;
+            border-radius:18px;
+            overflow:hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
         }
+
+        .card-header{
+            background:linear-gradient(135deg,#007bff,#0056b3);
+            color:white;
+            text-align:center;
+            padding:18px;
+            border:none;
+        }
+
+        .card-header h4{
+            margin:0;
+            font-weight:700;
+        }
+
+        .card-body{
+            padding:35px;
+        }
+
+        label{
+            font-weight:600;
+            color:#343a40;
+            margin-bottom:6px;
+        }
+
+        .form-control{
+            border-radius:10px;
+            height:45px;
+            border:1px solid #ced4da;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus{
+            box-shadow:none;
+            border-color:#007bff;
+        }
+
+        .input-group-text{
+            border-radius:0 10px 10px 0;
+            cursor:pointer;
+            background:#fff;
+        }
+
+        .btn{
+            border-radius:10px;
+            font-weight:600;
+            padding:10px;
+        }
+
+        .btn-primary{
+            background:linear-gradient(135deg,#007bff,#0056b3);
+            border:none;
+        }
+
+        .btn-primary:hover{
+            opacity:0.95;
+        }
+
+        .btn-secondary{
+            background:#e9ecef;
+            color:#343a40;
+            border:none;
+        }
+
+        .btn-secondary:hover{
+            background:#dee2e6;
+        }
+
+        .text-danger{
+            font-size:13px;
+        }
+
+        .alert{
+            border-radius:12px;
+        }
+
+        .toggle-password i{
+            color:#6c757d;
+        }
+
     </style>
 </head>
 
 <body>
-<div class="container mt-5">
+
+<div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card shadow">
+            <div class="card">
+                <!-- HEADER -->
+                <div class="card-header">
+                    <h4>
+                        <i class="fa fa-user-plus"></i>
+                        Tạo tài khoản
+                    </h4>
+                </div>
+
+                <!-- BODY -->
                 <div class="card-body">
 
-                    <h4 class="text-center mb-4">Tạo tài khoản</h4>
-
                     <!-- SUCCESS -->
-                    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+                    <div th:if="${success}" class="alert alert-success"
+                         th:text="${success}">
+                    </div>
 
                     <form th:action="@{/admin/create-user}" th:object="${req}" method="post">
-
                         <!-- USERNAME -->
                         <div class="form-group">
                             <label>Username</label>
@@ -45,29 +144,45 @@
                         <!-- PASSWORD -->
                         <div class="form-group">
                             <label>Password</label>
+
                             <div class="input-group">
-                                <input type="password" class="form-control" th:field="*{password}" id="password">
+                                <input type="password"
+                                       class="form-control"
+                                       th:field="*{password}"
+                                       id="password">
+
                                 <div class="input-group-append">
-                            <span class="input-group-text toggle-password" onclick="togglePassword('password','eye1')">
-                                <i class="fa fa-eye" id="eye1"></i>
-                            </span>
+                                    <span class="input-group-text toggle-password"
+                                          onclick="togglePassword('password','eye1')">
+                                        <i class="fa fa-eye" id="eye1"></i>
+                                    </span>
                                 </div>
                             </div>
+
                             <small class="text-danger" th:errors="*{password}"></small>
                         </div>
 
                         <!-- CONFIRM PASSWORD -->
                         <div class="form-group">
                             <label>Confirm Password</label>
+
                             <div class="input-group">
-                                <input type="password" class="form-control" th:field="*{confirmPassword}" id="confirmPassword">
+                                <input type="password"
+                                       class="form-control"
+                                       th:field="*{confirmPassword}"
+                                       id="confirmPassword">
+
                                 <div class="input-group-append">
-                            <span class="input-group-text toggle-password" onclick="togglePassword('confirmPassword','eye2')">
-                                <i class="fa fa-eye" id="eye2"></i>
-                            </span>
+                                    <span class="input-group-text toggle-password"
+                                          onclick="togglePassword('confirmPassword','eye2')">
+                                        <i class="fa fa-eye" id="eye2"></i>
+                                    </span>
                                 </div>
                             </div>
-                            <small class="text-danger" th:errors="*{confirmPassword}"></small>
+
+                            <small class="text-danger"
+                                   th:errors="*{confirmPassword}">
+                            </small>
                         </div>
 
                         <!-- FULL NAME -->
@@ -101,6 +216,7 @@
                         <!-- ROLE -->
                         <div class="form-group">
                             <label>Role</label>
+
                             <select class="form-control" th:field="*{role}">
                                 <option value="">-- Chọn role --</option>
                                 <option th:each="r : ${roles}"
@@ -108,16 +224,19 @@
                                         th:text="${r}">
                                 </option>
                             </select>
+
                             <small class="text-danger" th:errors="*{role}"></small>
                         </div>
 
                         <!-- BUTTON -->
                         <button class="btn btn-primary btn-block mt-3">
+                            <i class="fa fa-check"></i>
                             Tạo tài khoản
                         </button>
 
-                        <!-- BACK -->
-                        <a th:href="@{/admin/users}"  class="btn btn-secondary btn-block mt-2">
+                        <a th:href="@{/admin/users}"
+                           class="btn btn-secondary btn-block mt-2">
+                            <i class="fa fa-arrow-left"></i>
                             Quay lại
                         </a>
                     </form>
@@ -126,6 +245,7 @@
         </div>
     </div>
 </div>
+
 <!-- JS -->
 <script>
     function togglePassword(inputId, iconId) {
@@ -143,5 +263,6 @@
         }
     }
 </script>
+
 </body>
 </html>

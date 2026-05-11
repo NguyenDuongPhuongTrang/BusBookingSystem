@@ -10,9 +10,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class RouteServiceImpl
-        implements RouteService {
-
+public class RouteServiceImpl implements RouteService {
     private final RouteRepository routeRepository;
 
     @Override

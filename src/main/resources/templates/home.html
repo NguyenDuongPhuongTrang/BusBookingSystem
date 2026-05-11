@@ -7,9 +7,8 @@
     <title>Home</title>
 
     <style>
-
         .search-box {
-            background: white;
+            background: #fff;
             padding: 24px;
             border-radius: 14px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
@@ -18,32 +17,64 @@
         .trip-card {
             border: none;
             border-radius: 14px;
-            transition: 0.2s;
+            transition: all 0.2s ease;
+            padding: 10px;
         }
 
         .trip-card:hover {
             transform: translateY(-3px);
+            box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+        }
+
+        .trip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
         }
 
         .trip-route {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
+            color: #333;
         }
 
-        .trip-info {
+        .trip-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #198754;
+        }
+
+        .trip-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            font-size: 14px;
             color: #666;
-            margin-top: 10px;
+            margin-top: 6px;
+        }
+
+        .trip-meta span {
+            background: #f8f9fa;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .trip-actions {
+            margin-top: 12px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
         }
 
         .empty-box {
-            background: white;
+            background: #fff;
             padding: 30px;
             border-radius: 14px;
             text-align: center;
             color: #888;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
-
     </style>
 
 </head>
@@ -51,14 +82,11 @@
 <body>
 
 <div layout:fragment="content">
-
+    <h4 class="mb-4">
+        🔎 Tìm chuyến xe
+    </h4>
     <!-- SEARCH -->
     <div class="search-box">
-
-        <h4 class="mb-4">
-            🔎 Tìm chuyến xe
-        </h4>
-
         <!-- ERROR -->
         <div th:if="${error != null}"
              class="alert alert-danger">
@@ -171,80 +199,64 @@
 
                 <div class="card-body">
 
-                    <!-- ROUTE -->
-                    <div class="trip-route">
+                    <!-- HEADER -->
+                    <div class="trip-header">
 
-                        <span th:text="${trip.route.origin.name}">
-                        </span>
+                        <div class="trip-route">
+                            &nbsp;
+                            <span th:text="${trip.route.origin.name}"></span>
+                            →
+                            <span th:text="${trip.route.destination.name}"></span>
+                        </div>
 
-                        →
-
-                        <span th:text="${trip.route.destination.name}">
-                        </span>
+                        <div class="trip-price">
+                <span th:text="${#numbers.formatDecimal(
+                    trip.price,
+                    0,
+                    'COMMA',
+                    0,
+                    'POINT'
+                )}"></span>đ
+                        </div>
 
                     </div>
 
-                    <!-- INFO -->
-                    <div class="trip-info">
+                    <!-- META INFO -->
+                    <div class="trip-meta">
 
-                        ⏰
+            <span th:text="${#temporals.format(
+                trip.departureTime,
+                'HH:mm dd/MM/yyyy'
+            )}"></span>
 
-                        <span th:text="${#temporals.format(
-                            trip.departureTime,
-                            'HH:mm dd/MM/yyyy'
-                        )}">
-                        </span>
-
-                        &nbsp;&nbsp;|&nbsp;&nbsp;
-
-                        🚌
-
-                        <span th:text="${trip.bus.busType}">
-                        </span>
-
-                        &nbsp;&nbsp;|&nbsp;&nbsp;
-
-                        💰
-
-                        <span th:text="${#numbers.formatDecimal(
-                            trip.price,
-                            0,
-                            'COMMA',
-                            0,
-                            'POINT'
-                        )}">
-                        </span>đ
-
-                        &nbsp;&nbsp;|&nbsp;&nbsp;
-
-                        👤
-
-                        <span th:text="${trip.driver.fullName}">
-                        </span>
+                        <span th:text="${trip.bus.busType}"></span>
 
                     </div>
 
                     <!-- ACTION -->
-                    <div class="mt-3">
+                    <div class="trip-actions">
 
-                        <a th:href="@{/trips/{id}/seats(id=${trip.id})}"
+                        <a th:if="${trip.status.name() == 'OPEN'}"
+                           th:href="@{/trips/{id}/seats(id=${trip.id})}"
                            class="btn btn-success btn-sm">
 
-                            <i class="fa fa-chair"></i>
                             Chọn ghế
 
                         </a>
 
+                        <button th:if="${trip.status.name() == 'FULL'}"
+                                class="btn btn-secondary btn-sm"
+                                data-toggle="modal"
+                                data-target="#fullModal">
+
+                            Hết chỗ
+
+                        </button>
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 </body>

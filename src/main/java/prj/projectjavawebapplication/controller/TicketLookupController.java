@@ -17,66 +17,32 @@ public class TicketLookupController {
 
     private final TicketService ticketService;
 
-    /*
-     * FORM
-     */
-
+    // LOOKUP
     @GetMapping
-    public String lookupPage(
-            Model model
-    ) {
-
-        model.addAttribute(
-                "searchDTO",
-                new TicketSearchDTO()
-        );
-
+    public String lookupPage(Model model) {
+        model.addAttribute("searchDTO", new TicketSearchDTO());
         return "ticket/lookup";
     }
 
-    /*
-     * SEARCH
-     */
-
+    // SEARCH
     @PostMapping
-    public String lookup(
-            @Valid
-            @ModelAttribute("searchDTO")
-            TicketSearchDTO dto,
-
-            BindingResult result,
-
-            Model model
-    ) {
-
-        /*
-         * VALIDATE
-         */
+    public String lookup(@Valid @ModelAttribute("searchDTO") TicketSearchDTO dto,
+                         BindingResult result,
+                         Model model) {
 
         if (result.hasErrors()) {
-
             return "ticket/lookup";
         }
 
         try {
-
-            Ticket ticket =
-                    ticketService.findByCodeAndPhone(
+            Ticket ticket = ticketService.findByCodeAndPhone(
                             dto.getTicketCode(),
-                            dto.getPhone()
-                    );
+                            dto.getPhone());
 
-            model.addAttribute(
-                    "ticket",
-                    ticket
-            );
+            model.addAttribute("ticket", ticket);
 
         } catch (Exception e) {
-
-            model.addAttribute(
-                    "error",
-                    e.getMessage()
-            );
+            model.addAttribute("error", e.getMessage());
         }
 
         return "ticket/lookup";

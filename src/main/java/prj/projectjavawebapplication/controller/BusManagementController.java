@@ -15,6 +15,7 @@ import prj.projectjavawebapplication.model.entity.Bus;
 import prj.projectjavawebapplication.model.entity.Driver;
 import prj.projectjavawebapplication.repository.BusRepository;
 import prj.projectjavawebapplication.repository.DriverRepository;
+import prj.projectjavawebapplication.service.BusService;
 
 @Controller
 @RequestMapping("/admin/buses")
@@ -23,126 +24,66 @@ public class BusManagementController {
 
     private final BusRepository busRepository;
     private final DriverRepository driverRepository;
+    private final BusService busService;
 
-    /*
-     * =========================
-     * LIST + PAGINATION
-     * =========================
-     */
-
+    // LIST + PAGINATION
     @GetMapping
-    public String buses(
-            @RequestParam(defaultValue = "0") int page,
-            Model model
-    ) {
-
+    public String buses(@RequestParam(defaultValue = "0") int page, Model model) {
         Pageable pageable = PageRequest.of(page, 5);
-
         Page<Bus> busPage = busRepository.findAll(pageable);
-
         model.addAttribute("busPage", busPage);
-
         return "admin/buses/list";
     }
 
-    /*
-     * =========================
-     * CREATE FORM
-     * =========================
-     */
-
+    // CREATE FORM
     @GetMapping("/create")
     public String createForm(Model model) {
-
         model.addAttribute("busDTO", new BusDTO());
-
-        model.addAttribute(
-                "drivers",
-                driverRepository.findAll()
-        );
-
+        model.addAttribute("drivers", driverRepository.findAll());
         return "admin/buses/create";
     }
 
-    /*
-     * =========================
-     * CREATE
-     * =========================
-     */
-
+    // CREATE
     @PostMapping("/create")
-    public String create(
-            @Valid @ModelAttribute("busDTO") BusDTO dto,
-            BindingResult result,
-            Model model,
-            RedirectAttributes redirectAttributes
-    ) {
+    public String create(@Valid @ModelAttribute("busDTO") BusDTO dto,
+                         BindingResult result,
+                         Model model,
+                         RedirectAttributes redirectAttributes) {
 
-        // CHECK LICENSE PLATE
-        if (busRepository.existsByLicensePlate(
-                dto.getLicensePlate()
-        )) {
-
-            result.rejectValue(
-                    "licensePlate",
-                    "error.busDTO",
-                    "Biển số xe đã tồn tại"
-            );
+        // CHECK BIỂN SỐ XE
+        if (busRepository.existsByLicensePlate(dto.getLicensePlate())) {
+            result.rejectValue("licensePlate", "error.busDTO", "Biển số xe đã tồn tại");
         }
 
         // VALIDATE
         if (result.hasErrors()) {
-
-            model.addAttribute(
-                    "drivers",
-                    driverRepository.findAll()
-            );
-
+            model.addAttribute("drivers", driverRepository.findAll());
             return "admin/buses/create";
         }
 
-        // FIND DRIVER
-        Driver driver = driverRepository
-                .findById(dto.getDriverId())
-                .orElseThrow(() ->
-                        new RuntimeException("Không tìm thấy tài xế"));
+        // TÌM TÀI XẾ
+        Driver driver = driverRepository.findById(dto.getDriverId()).orElseThrow(() -> new RuntimeException("Không tìm thấy tài xế"));
 
-        // CREATE BUS
+        // TẠO XE
         Bus bus = new Bus();
 
         bus.setLicensePlate(dto.getLicensePlate());
         bus.setBusType(dto.getBusType());
         bus.setTotalSeats(dto.getTotalSeats());
         bus.setCompanyName(dto.getCompanyName());
-
-        // SET DRIVER
         bus.setDriver(driver);
 
-        busRepository.save(bus);
+        busService.save(bus);
 
-        redirectAttributes.addFlashAttribute(
-                "success",
-                "Thêm xe thành công!"
-        );
+        redirectAttributes.addFlashAttribute("success", "Thêm xe thành công!");
 
         return "redirect:/admin/buses";
     }
 
-    /*
-     * =========================
-     * EDIT FORM
-     * =========================
-     */
-
+    // EDIT FORM
     @GetMapping("/edit/{id}")
-    public String editForm(
-            @PathVariable Long id,
-            Model model
-    ) {
-
-        Bus bus = busRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Không tìm thấy xe"));
+    public String editForm(@PathVariable Long id, Model model) {
+        Bus bus = busRepository.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy xe"));
 
         BusDTO dto = new BusDTO();
 
@@ -152,69 +93,38 @@ public class BusManagementController {
         dto.setTotalSeats(bus.getTotalSeats());
         dto.setCompanyName(bus.getCompanyName());
 
-        // DRIVER
         if (bus.getDriver() != null) {
             dto.setDriverId(bus.getDriver().getId());
         }
 
         model.addAttribute("busDTO", dto);
-
-        model.addAttribute(
-                "drivers",
-                driverRepository.findAll()
-        );
-
+        model.addAttribute("drivers", driverRepository.findAll());
         return "admin/buses/edit";
     }
 
-    /*
-     * =========================
-     * UPDATE
-     * =========================
-     */
-
+    // UPDATE
     @PostMapping("/edit")
-    public String update(
-            @Valid @ModelAttribute("busDTO") BusDTO dto,
-            BindingResult result,
-            Model model,
-            RedirectAttributes redirectAttributes
-    ) {
+    public String update(@Valid @ModelAttribute("busDTO") BusDTO dto,
+                         BindingResult result,
+                         Model model,
+                         RedirectAttributes redirectAttributes) {
 
-        // CHECK LICENSE PLATE
-        if (busRepository.existsByLicensePlateAndIdNot(
-                dto.getLicensePlate(),
-                dto.getId()
-        )) {
-
-            result.rejectValue(
-                    "licensePlate",
-                    "error.busDTO",
-                    "Biển số xe đã tồn tại"
-            );
+        // CHECK BIỂN SỐ XE
+        if (busRepository.existsByLicensePlateAndIdNot(dto.getLicensePlate(), dto.getId())) {
+            result.rejectValue("licensePlate", "error.busDTO", "Biển số xe đã tồn tại");
         }
 
         // VALIDATE
         if (result.hasErrors()) {
-
-            model.addAttribute(
-                    "drivers",
-                    driverRepository.findAll()
-            );
-
+            model.addAttribute("drivers", driverRepository.findAll());
             return "admin/buses/edit";
         }
 
-        // FIND BUS
-        Bus bus = busRepository.findById(dto.getId())
-                .orElseThrow(() ->
-                        new RuntimeException("Không tìm thấy xe"));
+        // TÌM XE
+        Bus bus = busRepository.findById(dto.getId()).orElseThrow(() -> new RuntimeException("Không tìm thấy xe"));
 
-        // FIND DRIVER
-        Driver driver = driverRepository
-                .findById(dto.getDriverId())
-                .orElseThrow(() ->
-                        new RuntimeException("Không tìm thấy tài xế"));
+        // TÌM TÀI XẾ
+        Driver driver = driverRepository.findById(dto.getDriverId()).orElseThrow(() -> new RuntimeException("Không tìm thấy tài xế"));
 
         // UPDATE
         bus.setLicensePlate(dto.getLicensePlate());
@@ -222,42 +132,22 @@ public class BusManagementController {
         bus.setTotalSeats(dto.getTotalSeats());
         bus.setCompanyName(dto.getCompanyName());
 
-        // SET DRIVER
         bus.setDriver(driver);
 
-        busRepository.save(bus);
+        busService.save(bus);
 
-        redirectAttributes.addFlashAttribute(
-                "success",
-                "Cập nhật xe thành công!"
-        );
+        redirectAttributes.addFlashAttribute("success", "Cập nhật xe thành công!");
 
         return "redirect:/admin/buses";
     }
 
-    /*
-     * =========================
-     * DELETE
-     * =========================
-     */
-
-    @GetMapping("/delete/{id}")
-    public String delete(
-            @PathVariable Long id,
-            RedirectAttributes redirectAttributes
-    ) {
-
-        Bus bus = busRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Không tìm thấy xe"));
-
-        busRepository.delete(bus);
-
-        redirectAttributes.addFlashAttribute(
-                "success",
-                "Xóa xe thành công!"
-        );
-
+    // KHOÁ/MỞ
+    @GetMapping("/toggle/{id}")
+    public String toggleStatus(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        Bus bus = busService.findById(id);
+        bus.setActive(!bus.getActive());
+        busService.save(bus);
+        redirectAttributes.addFlashAttribute("success", "Cập nhật trạng thái xe thành công");
         return "redirect:/admin/buses";
     }
 }

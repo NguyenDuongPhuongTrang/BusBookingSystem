@@ -7,7 +7,6 @@ import prj.projectjavawebapplication.model.entity.User;
 import java.util.List;
 
 public interface TicketService {
-
     List<Ticket> bookTicket(
             BookingDTO dto,
             User user
@@ -21,4 +20,5 @@ public interface TicketService {
     List<Ticket> getPendingTickets();
     void confirmTicket(Long id);
     void cancelTicket(Long id);
+    List<Ticket> getAllTickets();
 }

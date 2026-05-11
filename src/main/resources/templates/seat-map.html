@@ -333,7 +333,6 @@
 </div>
 
 <script>
-
     const selectedSeats = [];
     const currentUserId = /*[[${currentUserId}]]*/ null;
     const tripId = /*[[${tripId}]]*/ null;
@@ -352,11 +351,10 @@
             if (index >= 0) {
                 selectedSeats.splice(index, 1);
                 btn.classList.remove("selected");
-                btn.classList.add("available"); // luôn về xanh khi bỏ chọn
+                btn.classList.add("available");
                 renderBill();
 
             } else {
-                // Chọn ghế → hold ngay trên server
                 try {
                     const res = await fetch("/seats/hold", {
                         method: "POST",
@@ -374,11 +372,10 @@
                     if (!res.ok) {
                         const err = await res.text();
                         alert("Không thể giữ ghế: " + err);
-                        location.reload(); // reload để cập nhật trạng thái mới nhất
+                        location.reload();
                         return;
                     }
 
-                    // Hold thành công → cập nhật UI
                     selectedSeats.push({ id: seatId, name: seatName, price });
                     btn.classList.remove("available", "pending");
                     btn.classList.add("selected");
@@ -406,14 +403,11 @@
         totalPriceText.textContent =
             total.toLocaleString("vi-VN");
 
-        // Tạo hidden inputs cho form submit
         seatInputs.innerHTML = selectedSeats
             .map(s => `<input type="hidden" name="seatIds" value="${s.id}">`)
             .join("");
     }
 
-    // Gọi API hold trước khi submit form
-    // Submit form chỉ cần gửi seatIds, không cần hold lại
     document.querySelector("form").addEventListener("submit", async (e) => {
         e.preventDefault();
 

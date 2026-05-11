@@ -1,5 +1,7 @@
 package prj.projectjavawebapplication.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import prj.projectjavawebapplication.enums.Role;
 import prj.projectjavawebapplication.model.entity.User;
@@ -14,5 +16,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByRoleNotAndUsernameContainingIgnoreCase(
             Role role,
             String keyword
+    );
+
+    Page<User> findByRoleNot(Role role, Pageable pageable);
+    Page<User> findByRoleNotAndUsernameContainingIgnoreCase(
+            Role role,
+            String keyword,
+            Pageable pageable
     );
 }
